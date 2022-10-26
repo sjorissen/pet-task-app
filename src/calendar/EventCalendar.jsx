@@ -72,10 +72,10 @@ export class EventCalendar extends React.Component {
                         headerToolbar={{
                             left: 'prev,next today',
                             center: 'title',
-                            right: 'timeGridWeek dayGridMonth listWeek'
+                            right: 'dayGridWeek dayGridMonth listWeek'
                         }}
 
-                        initialView   = "timeGridWeek"
+                        initialView   = "dayGridWeek"
                         editable      = {true}
                         selectable    = {true}
                         selectMirror  = {true}
