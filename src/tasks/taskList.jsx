@@ -3,6 +3,11 @@ import TextField from '@mui/material/TextField';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import List from '@mui/material/List';
+import ListItem from '@mui/material/ListItem';
+import ListItemText from '@mui/material/ListItemText';
+import MenuItem from '@mui/material/MenuItem';
+import Menu from '@mui/material/Menu';
 import './taskList.css'
 
 //import Modal from '@mui/material/Modal';
@@ -15,11 +20,35 @@ export function NewTask(){
     const [startDate, setStartDate] = useState([null,null]);
     const [endDate, setEndDate] = useState([null,null]);
 
+    const [anchorEl, setAnchorEl] = React.useState(null);
+    const [selectedIndex, setSelectedIndex] = React.useState(1);
+    const open = Boolean(anchorEl);
+
+    const options = [
+      'Choose an Option:',
+        'Daily',
+        'Weekly',
+        'None'
+    ];
+
+
+
     const toggleModal = () => {
         setModal(!modal);
     }
 
+    const handleClickListItem = (event) => {
+        setAnchorEl(event.currentTarget);
+    };
 
+    const handleMenuItemClick = (event, index) => {
+        setSelectedIndex(index);
+        setAnchorEl(null);
+    };
+
+    const handleClose = () => {
+        setAnchorEl(null);
+    };
 
 
     if(modal) {
@@ -27,6 +56,8 @@ export function NewTask(){
     } else {
         document.body.classList.remove('active-modal')
     }
+
+
 
     return (
         <>
@@ -63,6 +94,7 @@ export function NewTask(){
 
                  <LocalizationProvider dateAdapter={AdapterDayjs}>
                      <DatePicker
+                         required
                          label="Start Date"
                          value={startDate}
                          onChange={(newValue) => {
@@ -74,6 +106,7 @@ export function NewTask(){
 
                  <LocalizationProvider dateAdapter={AdapterDayjs}>
                      <DatePicker
+                         required
                          label="End Date"
                          value={endDate}
                          onChange={(newValue) => {
@@ -83,6 +116,47 @@ export function NewTask(){
                      />
                  </LocalizationProvider>
 
+                 <List
+                     component="nav"
+                     aria-label="Device settings"
+                     sx={{ bgcolor: 'background.paper' }}
+                 >
+                     <ListItem
+                         button
+                         id="lock-button"
+                         aria-haspopup="listbox"
+                         aria-controls="lock-menu"
+                         aria-label="when device is locked"
+                         aria-expanded={open ? 'true' : undefined}
+                         onClick={handleClickListItem}
+                     >
+                         <ListItemText
+                             primary="Repeat: "
+                             secondary={options[selectedIndex]}
+                         />
+                     </ListItem>
+                 </List>
+                 <Menu
+                     id="lock-menu"
+                     anchorEl={anchorEl}
+                     open={open}
+                     onClose={handleClose}
+                     MenuListProps={{
+                         'aria-labelledby': 'lock-button',
+                         role: 'listbox',
+                     }}
+                 >
+                     {options.map((option, index) => (
+                         <MenuItem
+                             key={option}
+                             disabled={index === 0}
+                             selected={index === selectedIndex}
+                             onClick={(event) => handleMenuItemClick(event, index)}
+                         >
+                             {option}
+                         </MenuItem>
+                     ))}
+                 </Menu>
 
 
                  <button
