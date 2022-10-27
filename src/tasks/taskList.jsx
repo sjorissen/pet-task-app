@@ -1,6 +1,8 @@
 import React, {useState} from "react";
 import TextField from '@mui/material/TextField';
-import DatePicker from 'react-date-picker';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import './taskList.css'
 
 //import Modal from '@mui/material/Modal';
@@ -10,8 +12,8 @@ export function NewTask(){
     const [modal, setModal] = useState(false);
     //const [open, setOpen] = useState(false);
 
-    const [startDate, setStartDate] = useState(new Date());
-    const [endDate, setEndDate] = useState(new Date());
+    const [startDate, setStartDate] = useState([null,null]);
+    const [endDate, setEndDate] = useState([null,null]);
 
     const toggleModal = () => {
         setModal(!modal);
@@ -59,30 +61,28 @@ export function NewTask(){
                      variant = "standard"
                  />
 
-                 <TextField
-                     id = "date"
-                     label = "Date"
-                     variant = "standard"
-                 />
+                 <LocalizationProvider dateAdapter={AdapterDayjs}>
+                     <DatePicker
+                         label="Start Date"
+                         value={startDate}
+                         onChange={(newValue) => {
+                             setStartDate(newValue);
+                         }}
+                         renderInput={(params) => <TextField {...params} />}
+                     />
+                 </LocalizationProvider>
 
-                 <DatePicker
-                     required
-                     selected = {startDate}
-                     onChange = {(date) => setStartDate(date)}
-                     selectsStart
-                     startDate = {startDate}
-                     endDate = {endDate}
-                 />
+                 <LocalizationProvider dateAdapter={AdapterDayjs}>
+                     <DatePicker
+                         label="End Date"
+                         value={endDate}
+                         onChange={(newValue) => {
+                             setEndDate(newValue);
+                         }}
+                         renderInput={(params) => <TextField {...params} />}
+                     />
+                 </LocalizationProvider>
 
-                 <DatePicker
-                     required
-                     selected = {endDate}
-                     onChange = {(date) => setEndDate(date)}
-                     selectsEnd
-                     startDate={startDate}
-                     endDate={endDate}
-                     minDate={startDate}
-                  />
 
 
                  <button
