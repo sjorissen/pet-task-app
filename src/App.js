@@ -1,7 +1,14 @@
 import logo from './logo.svg';
+import {NewTask} from "./tasks/taskList";
 import './App.css';
 
 function App() {
+
+    return <>
+      <NewTask />
+    </>
+
+
   return (
     <div className="App">
       <header className="App-header">
