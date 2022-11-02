@@ -1,0 +1,82 @@
+{
+  "root": true,
+  "parser": "@typescript-eslint/parser",
+  "parserOptions": {
+    "project": [
+      "tsconfig.json"
+    ]
+  },
+  "extends": [
+    "react-app",
+    "react-app/jest",
+    "airbnb-typescript",
+    "prettier",
+    "eslint:recommended",
+    "plugin:@typescript-eslint/recommended"
+  ],
+  "ignorePatterns": [
+    "build",
+    ".cache",
+    ".eslintrc.cjs"
+  ],
+  "plugins": [
+    "prettier",
+    "@typescript-eslint"
+  ],
+  "rules": {
+    "prettier/prettier": [
+      "error",
+      {
+        "arrowParens": "avoid",
+        "bracketSameLine": true,
+        "bracketSpacing": true,
+        "jsxSingleQuote": false,
+        "quoteProps": "as-needed",
+        "semi": true,
+        "singleQuote": true,
+        "tabWidth": 2,
+        "printWidth": 100
+      }
+    ],
+    "@typescript-eslint/no-namespace": "off",
+    "@typescript-eslint/explicit-module-boundary-types": "off",
+    "@typescript-eslint/no-empty-function": "off",
+    "@typescript-eslint/naming-convention": "off",
+    "@typescript-eslint/no-explicit-any": "off",
+    "@typescript-eslint/no-unused-expressions": "off",
+    "@typescript-eslint/ban-ts-comment": "off",
+    "@typescript-eslint/no-use-before-define": "off",
+    "react-hooks/exhaustive-deps": "off",
+    "no-underscore-dangle": "off",
+    "import/extensions": "off",
+    "import/order": [
+      "error",
+      {
+        "groups": [
+          "builtin",
+          "external",
+          "internal",
+          "parent",
+          "sibling",
+          "object",
+          "type",
+          "unknown"
+        ],
+        "pathGroups": [
+          {
+            "pattern": "~/**",
+            "group": "internal"
+          }
+        ],
+        "pathGroupsExcludedImportTypes": [
+          "react"
+        ],
+        "alphabetize": {
+          "order": "asc",
+          "caseInsensitive": true
+        },
+        "newlines-between": "never"
+      }
+    ]
+  }
+}
