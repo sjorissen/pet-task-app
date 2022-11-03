@@ -1,4 +1,5 @@
-import React, {useState} from "react";
+import React, {useRef, useState} from "react";
+//import * as fs from 'fs';
 import TextField from '@mui/material/TextField';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
@@ -13,9 +14,25 @@ import './taskList.css'
 //import Modal from '@mui/material/Modal';
 //import Button from '@mui/material/Button';
 
+function Task(name, desc, startD){
+    this.name = name;
+    this.desc = desc;
+    this.startD = startD;
+    /*this.endD = endD;
+    this.repetition = repetition;
+
+     */
+};
+
+
+
+
+
 export function NewTask(){
     const [modal, setModal] = useState(false);
-    //const [open, setOpen] = useState(false);
+    const [title, setTitle] = useState('');
+    const[desc, setDesc] = useState('');
+
 
     const [startDate, setStartDate] = useState([null,null]);
     const [endDate, setEndDate] = useState([null,null]);
@@ -57,7 +74,27 @@ export function NewTask(){
         document.body.classList.remove('active-modal')
     }
 
+    /*const name = document.getElementById('taskName');
+    const desc = document.getElementById('description');
+    const startD = document.getElementById('start');
+    const endD = document.getElementById('end');
+    const repetition = document.getElementById('lock-menu');*/
+    //const inputRef = useRef(null);
 
+
+
+    const handleSubmit = (e) => {
+        e.preventDefault()
+
+        var myTask = new Task(title, desc, startDate);
+
+       if(title && desc && startDate){
+            console.log("Task name: " + myTask.name);
+            console.log("Description: " + myTask.desc);
+            console.log("Start date: " + myTask.startD);
+        }
+
+    }
 
     return (
         <>
@@ -72,15 +109,19 @@ export function NewTask(){
             +
         </button>
 
-
+            <form onSubmit={handleSubmit}>
             {modal && (
          <div className = "modal">
              <div onClick={toggleModal}
-                 className = "overlay"></div>
+                 className = "overlay" ></div>
              <div className = "modal-content">
+
+
+
                  <h2> New Task</h2>
                  <TextField
                      required
+                     onChange = {(e) => setTitle(e.target.value)}
                      id = "taskName"
                      label = "Task Name:"
                      variant = "standard"
@@ -88,6 +129,7 @@ export function NewTask(){
 
                  <TextField
                      id = "description"
+                     onChange = {(e) => setDesc(e.target.value)}
                      label = "Description:"
                      variant = "standard"
                  />
@@ -95,11 +137,12 @@ export function NewTask(){
                  <LocalizationProvider dateAdapter={AdapterDayjs}>
                      <DatePicker
                          required
+                         id = "start"
                          label="Start Date"
                          value={startDate}
-                         onChange={(newValue) => {
-                             setStartDate(newValue);
-                         }}
+                         onChange={( e) =>
+                             setStartDate(e.target.value)
+                         }
                          renderInput={(params) => <TextField {...params} />}
                      />
                  </LocalizationProvider>
@@ -107,6 +150,7 @@ export function NewTask(){
                  <LocalizationProvider dateAdapter={AdapterDayjs}>
                      <DatePicker
                          required
+                         id = "end"
                          label="End Date"
                          value={endDate}
                          onChange={(newValue) => {
@@ -163,12 +207,41 @@ export function NewTask(){
                  className = 'close-modal'
                  onClick = {toggleModal}
                  >Close</button>
+
+                 <button
+                     className = 'save-modal'
+                     onClick = {SaveTask()}
+                 >Save</button>
+
              </div>
          </div>
                 )}
+            </form>
     </>
 
+
     );
+
+
+    function SaveTask(){
+
+
+       // var myTask = new Task(title);
+       // console.log(myTask.name);
+
+        /*var data =
+            '\r Name: ' + myTask.name + '\r\n ' //+
+            /*'Description: ' + task.desc + '\r\n ' +
+            'Start Date: ' + task.startD+ '\r\n ' +
+            'End Date: ' + task.endD + '\r\n' +
+            'Repeated: ' + task.repetition;*/
+
+           // console.log(taskName);
+
+
+
+
+    }
 }
 
 
