@@ -22,6 +22,19 @@ function Task(name, desc, startD, endD, repetition) {
   this.repetition = repetition;
 }
 
+function TaskList(taskList) {
+  this.taskList = taskList;
+}
+
+function AddTaskToList(task) {
+  var taskList = [];
+  taskList.push(task);
+}
+
+function getTaskList() {
+  return this.taskList;
+}
+
 export function NewTask() {
   const [modal, setModal] = useState(false);
   const [title, setTitle] = useState('');
@@ -79,6 +92,7 @@ export function NewTask() {
       console.log('Start date: ' + myTask.startD);
       console.log('End date: ' + myTask.endD);
       console.log('Repetition: ' + myTask.repetition);
+      AddTaskToList(myTask);
     }
     {
       toggleModal();
@@ -192,15 +206,11 @@ export function NewTask() {
     </>
   );
 
-  function SaveTask() {
-    // var myTask = new Task(title);
-    // console.log(myTask.name);
-    /*var data =
-        '\r Name: ' + myTask.name + '\r\n ' //+
-        /*'Description: ' + task.desc + '\r\n ' +
-        'Start Date: ' + task.startD+ '\r\n ' +
-        'End Date: ' + task.endD + '\r\n' +
-        'Repeated: ' + task.repetition;*/
-    // console.log(taskName);
+  function SaveTask() {}
+
+  function TaskToScreen() {
+    var list = document.createElement('list');
+    var inputValue = document.getElementById('taskName');
+    var t = document.createTextNode();
   }
 }
