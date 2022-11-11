@@ -1,11 +1,19 @@
+// YYYY-MM-DD of today
+//import '../api/api';
 let eventGuid = 0;
-let todayStr = new Date().toISOString().replace(/T.*$/, ''); // YYYY-MM-DD of today
+let todayStr = new Date().toISOString().replace(/T.*$/, '');
+// const api = new api();
+//
+// let testTask = api.getTask(1);
+// let testTitle = testTask.name;
+// let testDescription = testTask.description;
+// let testDate = testTask.date;
 
 export const INITIAL_EVENTS = [
   {
     // id: createEventId(),
     // title: 'All-day event',
-    // start: todayStr
+    // start: todayStr,
   },
   {
     // id: createEventId(),
