@@ -1,4 +1,5 @@
 //import * as fs from 'fs';
+import { ListItemButton } from '@mui/material';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemText from '@mui/material/ListItemText';
@@ -8,13 +9,19 @@ import TextField from '@mui/material/TextField';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
+import Api from '../api/api';
 import './taskList.css';
+import { getTask } from '../api/mocks';
 
 //import Modal from '@mui/material/Modal';
 //import Button from '@mui/material/Button';
 
-function Task(name, desc, startD, endD, repetition) {
+//const api = new Api();
+//console.log(api.getTask(1));
+
+function Task(id, name, desc, startD, endD, repetition) {
+  this.id = id;
   this.name = name;
   this.desc = desc;
   this.startD = startD;
@@ -22,20 +29,54 @@ function Task(name, desc, startD, endD, repetition) {
   this.repetition = repetition;
 }
 
-function TaskList(taskList) {
-  this.taskList = taskList;
+/*
+function getTask(task) {
+  return task;
+}
+
+function TaskList() {
+  taskList = [];
 }
 
 function AddTaskToList(task) {
-  var taskList = [];
   taskList.push(task);
 }
 
 function getTaskList() {
-  return this.taskList;
+  return taskList;
 }
 
-export function NewTask() {
+ */
+
+export function TaskToScreen({ taskid }) {
+  const [{ name, description, repeat, done, date }, setTask] = useState({
+    name: '',
+    description: '',
+    repeat: false,
+    done: false,
+    date: '2022-01-01',
+  });
+
+  const api = new Api();
+  useEffect(() => {
+    api.getTask(taskid).then(function (task) {
+      setTask(task);
+    });
+  }, [taskid]);
+
+  const todayTasks = [];
+  // let task = api.getTask(1);
+
+  todayTasks.push(
+    <ListItemButton>
+      <ListItemText primary={name} />
+    </ListItemButton>
+  );
+
+  return <div>{todayTasks}</div>;
+}
+
+export default function NewTask() {
   const [modal, setModal] = useState(false);
   const [title, setTitle] = useState('');
   const [desc, setDesc] = useState('');
@@ -84,19 +125,22 @@ export function NewTask() {
 
     let sD = startDate.toString();
     let eD = endDate.toString();
-    var myTask = new Task(title, desc, sD, eD, selectedIndex);
+    let id = 1;
+
+    //var taskList = new TaskList();
+    let myTask = new Task(id, title, desc, sD, eD, selectedIndex);
 
     if (title && (desc || !desc) && startDate && endDate && selectedIndex) {
+      console.log('Task ID: ' + myTask.id);
       console.log('Task name: ' + myTask.name);
       console.log('Description: ' + myTask.desc);
       console.log('Start date: ' + myTask.startD);
       console.log('End date: ' + myTask.endD);
       console.log('Repetition: ' + myTask.repetition);
-      AddTaskToList(myTask);
+      //AddTaskToList(myTask);
     }
-    {
-      toggleModal();
-    }
+    toggleModal();
+    //TaskToScreen();
   };
 
   return (
@@ -207,10 +251,4 @@ export function NewTask() {
   );
 
   function SaveTask() {}
-
-  function TaskToScreen() {
-    var list = document.createElement('list');
-    var inputValue = document.getElementById('taskName');
-    var t = document.createTextNode();
-  }
 }

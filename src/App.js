@@ -1,5 +1,6 @@
 // import logo from './logo.svg';
-import { NewTask } from './tasks/taskList';
+import NewTask from './tasks/taskList';
+import { TaskToScreen } from './tasks/taskList';
 import './App.css';
 
 function App() {
@@ -9,7 +10,10 @@ function App() {
     // eslint-disable-next-line react/jsx-filename-extension
 
     // eslint-disable-next-line react/jsx-filename-extension
-    <NewTask />
+    <>
+      <NewTask />
+      <TaskToScreen />
+    </>
 
     /*
     <div className="App">
