@@ -4,35 +4,17 @@ import dayGridPlugin from '@fullcalendar/daygrid'; // a plugin!
 import interactionPlugin from '@fullcalendar/interaction';
 import listPlugin from '@fullcalendar/list';
 import timeGridPlugin from '@fullcalendar/timegrid';
+import { Box, Button } from '@mui/material';
+import Modal from '@mui/material/Modal';
 import React, { useEffect, useState } from 'react';
 import Api from '../api/api';
 import { INITIAL_EVENTS, createEventId } from './event-utils';
 
-//const api = new Api();
-// let testTask = api.getTask(1);
-//
 // let testTitle = testTask.name;
 //
 // let testDescription = testTask.description;
 //
 // let testDate = testTask.date;
-// function RenderTask({ taskId }) {
-//   const [{ name, description }, setTask] = useState({
-//     name: '',
-//     description: '',
-//   });
-//
-//   const api = new Api();
-//
-//   useEffect(() => {
-//     api.getTask(taskId).then(function (task) {
-//       setTask(task);
-//     });
-//   }, [taskId]);
-//   return(
-//
-//   )
-// }
 
 // function handleEventClick = clickInfo() => {
 //   // eslint-disable-next-line no-restricted-globals
@@ -47,17 +29,47 @@ import { INITIAL_EVENTS, createEventId } from './event-utils';
 //   });
 // };
 //This will render the event information for the calendar
-function renderEventContent(eventInfo) {
+
+function RenderEventContent({ taskInfo }) {
+  const api = new Api();
+
+  const [{ name, description, date, repeat }, setTask] = useState({
+    name: '',
+    description: '',
+    date: '',
+    repeat: false,
+  });
+
+  useEffect(() => {
+    api.getTask(taskInfo).then(function (task) {
+      setTask(task);
+    });
+  }, [taskInfo]);
+
+  const dispDate = new Date(date);
+
   return (
     <>
-      <b>{eventInfo.timeText}</b>
+      <b>{date}</b>
       <b>
-        <i>{eventInfo.event.title + ':'}</i>
+        <i>{name + ':'}</i>
       </b>
-      <i>{eventInfo.event.extendedProps.description}</i>
+      <i>{description}</i>
     </>
   );
 }
+
+const style = {
+  position: 'absolute',
+  top: '50%',
+  left: '50%',
+  transform: 'translate(-50%, -50%)',
+  width: 650,
+  bgcolor: 'background.paper',
+  border: '2px solid #000',
+  boxShadow: 24,
+  p: 4,
+};
 
 export default function EventCalendar() {
   // //This is to let the calendar show weekends, also not needed. User cannot manipulate if weekends are visible
@@ -65,40 +77,47 @@ export default function EventCalendar() {
   //This is to show pre-made events
   const currentEvents = useState([]);
 
+  const [open, setOpen] = React.useState(false);
+  const handleOpen = () => setOpen(true);
+  const handleClose = () => setOpen(false);
   return (
-    <div className="event-calendar">
-      {/*{this.renderSidebar()}*/}
-      <div className="event-calendar-main">
-        <FullCalendar
-          plugins={[dayGridPlugin, timeGridPlugin, listPlugin, interactionPlugin]}
-          //This is for the toolbar above the calendar.
-          headerToolbar={{
-            left: 'prev,next today',
-            center: 'title',
-            right: 'dayGridWeek dayGridMonth listWeek',
-          }}
-          initialView="dayGridWeek"
-          editable={true}
-          //This allows the dates to be selectable
-          selectable={true}
-          //---------- selectMirror allows the user to see a placeholder when dragging the event
-          selectMirror={true}
-          dayMaxEvents={true}
-          eventMaxStack={true}
-          weekends={true}
-          //If we hardcode any initial events
-          initialEvents={INITIAL_EVENTS}
-          eventContent={renderEventContent}
-
-          // select={this.handleDateSelect}
-          // eventClick={this.handleEventClick}
-          // eventsSet={this.handleEvents}
-
-          // eventMouseEnter={handleMouseEnter}
-          // eventMouseLeave={handleMouseLeave}
-        />
+    <>
+      <div className="event-calendar">
+        <Button onClick={handleOpen}>Open modal</Button>
+        <Modal
+          open={open}
+          onClose={handleClose}
+          aria-labelledby="modal-modal-title"
+          aria-describedby="modal-modal-description">
+          <Box sx={style}>
+            <div className="event-calendar-main">
+              {/*{this.renderSidebar()}*/}
+              <FullCalendar
+                plugins={[dayGridPlugin, timeGridPlugin, listPlugin, interactionPlugin]}
+                //This is for the toolbar above the calendar.
+                headerToolbar={{
+                  left: 'prev,next today',
+                  center: 'title',
+                  right: 'dayGridWeek dayGridMonth listWeek',
+                }}
+                initialView="dayGridWeek"
+                editable={true}
+                //This allows the dates to be selectable
+                selectable={true}
+                //---------- selectMirror allows the user to see a placeholder when dragging the event
+                selectMirror={true}
+                dayMaxEvents={true}
+                eventMaxStack={true}
+                weekends={true}
+                //If we hardcode any initial events
+                initialEvents={INITIAL_EVENTS}
+                eventContent={RenderEventContent}
+              />
+            </div>
+          </Box>
+        </Modal>
       </div>
-    </div>
+    </>
   );
 }
 
