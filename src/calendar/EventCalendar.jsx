@@ -6,58 +6,72 @@ import listPlugin from '@fullcalendar/list';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import { Box, Button } from '@mui/material';
 import Modal from '@mui/material/Modal';
+import moment from 'moment';
 import React, { useEffect, useState } from 'react';
 import Api from '../api/api';
 import { INITIAL_EVENTS, createEventId } from './event-utils';
+/* let testTitle = testTask.name;
 
-// let testTitle = testTask.name;
-//
-// let testDescription = testTask.description;
-//
-// let testDate = testTask.date;
+  let testDescription = testTask.description;
 
-// function handleEventClick = clickInfo() => {
-//   // eslint-disable-next-line no-restricted-globals
-//   if (confirm(`Are you sure you want to delete the event '${clickInfo.event.title}'`)) {
-//     clickInfo.event.remove();
-//   }
-// };
-//
-// function handleEvents = events => {
-//   this.setState({
-//     currentEvents: events,
-//   });
-// };
+  let testDate = testTask.date;
+
+  function handleEventClick = clickInfo() => {
+    // eslint-disable-next-line no-restricted-globals
+    if (confirm(`Are you sure you want to delete the event '${clickInfo.event.title}'`)) {
+      clickInfo.event.remove();
+    }
+  };
+
+  function handleEvents = events => {
+    this.setState({
+      currentEvents: events,
+    });
+  };
 //This will render the event information for the calendar
+*/
 
-function RenderEventContent({ taskInfo }) {
+function TaskInfo({ taskInfo }) {
   const api = new Api();
+  //const dispDate = new Date(date);
 
   const [{ name, description, date, repeat }, setTask] = useState({
     name: '',
     description: '',
-    date: '',
+    date: moment(date).format('YYYY-MM-DD'),
     repeat: false,
   });
-
+  // const event = JSON.stringify(taskInfo);
   useEffect(() => {
     api.getTask(taskInfo).then(function (task) {
       setTask(task);
     });
   }, [taskInfo]);
 
-  const dispDate = new Date(date);
-
-  return (
-    <>
-      <b>{date}</b>
-      <b>
-        <i>{name + ':'}</i>
-      </b>
-      <i>{description}</i>
-    </>
-  );
+  // const event = new Event({ tile: name });
+  // event.setStart(date);
+  // event.setEnd(date);
+  //
+  // const eventsArray = [event];
+  //
+  // return (
+  //   <>
+  //     <b>{date}</b>
+  //     <i>{name}</i>
+  //   </>
+  // );
 }
+
+// function renderEventContent(TaskInfo(1)) {
+//   return (
+//     <>
+//       <b>{eventInfo.timeText}</b>
+//       <i>{eventInfo.event.title}</i>
+//     </>
+//   )
+// }
+
+const dispDate2 = new Date('2022/11/16');
 
 const style = {
   position: 'absolute',
@@ -72,10 +86,7 @@ const style = {
 };
 
 export default function EventCalendar() {
-  // //This is to let the calendar show weekends, also not needed. User cannot manipulate if weekends are visible
-  // const weekendVisible = useState(true);
-  //This is to show pre-made events
-  const currentEvents = useState([]);
+  const api = new Api();
 
   const [open, setOpen] = React.useState(false);
   const handleOpen = () => setOpen(true);
@@ -104,14 +115,16 @@ export default function EventCalendar() {
                 editable={true}
                 //This allows the dates to be selectable
                 selectable={true}
-                //---------- selectMirror allows the user to see a placeholder when dragging the event
-                selectMirror={true}
                 dayMaxEvents={true}
                 eventMaxStack={true}
                 weekends={true}
+                events={[
+                  { title: 'Event 1', date: '2022-11-15' },
+                  //{ title: 'Event 2', date: '2022-11-16' },
+                ]}
                 //If we hardcode any initial events
-                initialEvents={INITIAL_EVENTS}
-                eventContent={RenderEventContent}
+                //initialEvents={INITIAL_EVENTS}
+                //eventContent={renderEventContent}
               />
             </div>
           </Box>
