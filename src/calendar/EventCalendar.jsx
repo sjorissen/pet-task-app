@@ -9,7 +9,6 @@ import Modal from '@mui/material/Modal';
 import moment from 'moment';
 import React, { useEffect, useState } from 'react';
 import Api from '../api/api';
-import { INITIAL_EVENTS, createEventId } from './event-utils';
 /* let testTitle = testTask.name;
 
   let testDescription = testTask.description;
@@ -33,7 +32,7 @@ import { INITIAL_EVENTS, createEventId } from './event-utils';
 
 function TaskInfo({ taskInfo }) {
   const api = new Api();
-  //const dispDate = new Date(date);
+  //const displayDate = new Date(date);
 
   const [{ name, description, date, repeat }, setTask] = useState({
     name: '',
@@ -47,19 +46,6 @@ function TaskInfo({ taskInfo }) {
       setTask(task);
     });
   }, [taskInfo]);
-
-  // const event = new Event({ tile: name });
-  // event.setStart(date);
-  // event.setEnd(date);
-  //
-  // const eventsArray = [event];
-  //
-  // return (
-  //   <>
-  //     <b>{date}</b>
-  //     <i>{name}</i>
-  //   </>
-  // );
 }
 
 // function renderEventContent(TaskInfo(1)) {
@@ -71,7 +57,7 @@ function TaskInfo({ taskInfo }) {
 //   )
 // }
 
-const dispDate2 = new Date('2022/11/16');
+//const displayDate2 = new Date('2022/11/16');
 
 const style = {
   position: 'absolute',
@@ -88,6 +74,16 @@ const style = {
 export default function EventCalendar() {
   const api = new Api();
 
+  const [task, setTask] = useState(null);
+
+  useEffect(() => {
+    // eslint-disable-next-line @typescript-eslint/no-shadow
+    api.getTask(1).then(function (task) {
+      setTask(task);
+    });
+  }, []);
+
+  const tasks = task ? [task] : [];
   const [open, setOpen] = React.useState(false);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
@@ -102,29 +98,24 @@ export default function EventCalendar() {
           aria-describedby="modal-modal-description">
           <Box sx={style}>
             <div className="event-calendar-main">
-              {/*{this.renderSidebar()}*/}
               <FullCalendar
                 plugins={[dayGridPlugin, timeGridPlugin, listPlugin, interactionPlugin]}
+                initialView="dayGridWeek"
                 //This is for the toolbar above the calendar.
                 headerToolbar={{
                   left: 'prev,next today',
                   center: 'title',
                   right: 'dayGridWeek dayGridMonth listWeek',
                 }}
-                initialView="dayGridWeek"
                 editable={true}
                 //This allows the dates to be selectable
                 selectable={true}
                 dayMaxEvents={true}
                 eventMaxStack={true}
                 weekends={true}
-                events={[
-                  { title: 'Event 1', date: '2022-11-15' },
-                  //{ title: 'Event 2', date: '2022-11-16' },
-                ]}
-                //If we hardcode any initial events
-                //initialEvents={INITIAL_EVENTS}
-                //eventContent={renderEventContent}
+                // eslint-disable-next-line @typescript-eslint/no-shadow
+                events={tasks.map(task => ({ title: task.name, start: task.date }))}
+                datesSet={console.debug}
               />
             </div>
           </Box>
