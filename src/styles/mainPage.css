@@ -1,0 +1,31 @@
+#navbar{
+    flex-grow: 1
+}
+
+#appBar{
+    position: static
+}
+
+#furryMinder{
+    flex-grow: 1;
+    display: flex;
+    justify-content: center;
+}
+#login{
+    color: inherit
+}
+
+.column {
+    float: left;
+    padding: 10px;
+    box-sizing: border-box;
+}
+.left {
+    width: 25%;
+    box-sizing: border-box;
+}
+
+.right {
+    width: 75%;
+    box-sizing: border-box;
+}
