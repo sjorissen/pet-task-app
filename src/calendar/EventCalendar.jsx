@@ -1,208 +1,147 @@
-import React             from 'react'
-import FullCalendar      from '@fullcalendar/react' // must go before plugins
-import dayGridPlugin     from '@fullcalendar/daygrid' // a plugin!
-import timeGridPlugin    from "@fullcalendar/timegrid";
-import listPlugin        from "@fullcalendar/list";
-import interactionPlugin from "@fullcalendar/interaction";
+// eslint-disable-next-line import/order
+import FullCalendar from '@fullcalendar/react'; // must go before plugins
+import dayGridPlugin from '@fullcalendar/daygrid'; // a plugin!
+import interactionPlugin from '@fullcalendar/interaction';
+import listPlugin from '@fullcalendar/list';
+import timeGridPlugin from '@fullcalendar/timegrid';
+import { Box, Button } from '@mui/material';
+import Modal from '@mui/material/Modal';
+import React, { useEffect, useState } from 'react';
+import Api from '../api/api';
 import { INITIAL_EVENTS, createEventId } from './event-utils';
 
+// let testTitle = testTask.name;
+//
+// let testDescription = testTask.description;
+//
+// let testDate = testTask.date;
 
+// function handleEventClick = clickInfo() => {
+//   // eslint-disable-next-line no-restricted-globals
+//   if (confirm(`Are you sure you want to delete the event '${clickInfo.event.title}'`)) {
+//     clickInfo.event.remove();
+//   }
+// };
+//
+// function handleEvents = events => {
+//   this.setState({
+//     currentEvents: events,
+//   });
+// };
+//This will render the event information for the calendar
 
-export class EventCalendar extends React.Component {
+function RenderEventContent({ taskInfo }) {
+  const api = new Api();
 
+  const [{ name, description, date, repeat }, setTask] = useState({
+    name: '',
+    description: '',
+    date: '',
+    repeat: false,
+  });
 
-    state = {
-        weekendsVisible: true,
-        currentEvents: []
-    }
+  useEffect(() => {
+    api.getTask(taskInfo).then(function (task) {
+      setTask(task);
+    });
+  }, [taskInfo]);
 
-    //This will render the entire calendar
-    render()
-    {
-        function renderEventContent(eventInfo)
-        {
-            return(
-                <>
-                    <b>{eventInfo.timeText}</b>
-                    <b><i>{eventInfo.event.title +":" }</i></b>
-                    <i>{eventInfo.event.extendedProps.description}</i>
-                </>
-            )
-        }
-        //let tooltipInstance = null;
-        // //This is tooltip for events
-        // const handleMouseEnter = (info) =>
-        // {
-        //
-        //     if (info.event.extendedProps.description)
-        //     {
-        //         tooltipInstance = new Tooltip(info.el,
-        //             {
-        //             title: info.event.extendedProps.description,
-        //             html: true,
-        //             place: "top",
-        //             trigger: "hover",
-        //             container: "body"
-        //         });
-        //
-        //         tooltipInstance.show();
-        //     }
-        // }
-        //
-        // const handleMouseLeave = (info) =>
-        // {
-        //
-        //     if (info.event.extendedProps.description)
-        //     {
-        //         if (tooltipInstance)
-        //         {
-        //             tooltipInstance.dispose();
-        //             tooltipInstance = null;
-        //         }
-        //     }
-        // }
+  const dispDate = new Date(date);
 
-        return (
-            <div className = 'event-calendar'>
-                {/*{this.renderSidebar()}*/}
-                <div className = 'event-calendar-main'>
-                    <FullCalendar
-                        plugins={[ dayGridPlugin, timeGridPlugin, listPlugin, interactionPlugin ]}
-                        //This is for the toolbar above the calendar.
-                        headerToolbar={{
-                            left: 'prev,next today',
-                            center: 'title',
-                            right: 'dayGridWeek dayGridMonth listWeek'
-                        }}
-
-                        initialView   = "dayGridWeek"
-                        editable      = {true}
-                        selectable    = {true}
-                        selectMirror  = {true}
-                        dayMaxEvents  = {true}
-                        eventMaxStack = {true}
-                        weekends      = {this.state.weekendsVisible}
-                        initialEvents = {INITIAL_EVENTS}
-                        select        = {this.handleDateSelect}
-                        eventContent  = {renderEventContent}
-                        eventClick    = {this.handleEventClick}
-                        eventsSet     = {this.handleEvents}
-
-                        // eventMouseEnter={handleMouseEnter}
-                        // eventMouseLeave={handleMouseLeave}
-                    />
-                </div>
-            </div>
-        )
-    }
-
-    // renderSidebar()
-    // {
-    //     function renderSidebarEvent(event)
-    //     {
-    //         return(
-    //             <li key={event.id}>
-    //                 <b>{formatDate(event.start, {year: 'numeric', month: 'short', day: 'numeric'})}</b>
-    //                 <i>{event.title}</i>
-    //                 <i>{event.description}</i>
-    //             </li>
-    //         )
-    //     }
-
-    //     return(
-    //         <div className = 'event-calendar-sidebar'>
-    //             <div className = 'event-calendar-sidebar-section'>
-    //                 <h2>Instructions</h2>
-    //                 <ul>
-    //                     <li>
-    //                         To create a new event, click on a date, and you will be prompted for the title of the event,
-    //                         a description of the event, start-time/end-time, and whether the event is recurring.
-    //                     </li>
-    //                     <li>
-    //                         To update your events, drag and drop them to the desired time slot. You can also shorten
-    //                         and lengthen your events by resizing them accordingly.
-    //                     </li>
-    //                     <li>
-    //                         To delete an event, you can click on it.
-    //                     </li>
-    //                 </ul>
-    //             </div>
-    //             <div className = 'event-calendar-sidebar-section'>
-    //                 <label>
-    //                     <input
-    //                         type    = 'checkbox'
-    //                         checked = { this.state.weekendsVisible }
-    //                         onChange= { this.handleWeekendsToggle }
-    //                     ></input>
-    //                     Toggle weekends
-    //                 </label>
-    //             </div>
-    //             <div className = 'event-calendar-sidebar-section'>
-    //                 <h2>
-    //                     All Events ({this.state.currentEvents.length})
-    //                 </h2>
-    //                 <ul>
-    //                     {this.state.currentEvents.map(renderSidebarEvent)}
-    //                 </ul>
-    //             </div>
-    //         </div>
-    //
-    //     )
-    // }
-    //
-    // //this will handle what happens with the weekends toggle in our sidebar
-    // handleWeekendsToggle = () =>
-    // {
-    //     this.setState
-    //     ({
-    //             weekendsVisible: !this.state.weekendsVisible
-    //     })
-    // }
-
-    handleDateSelect = (selectInfo) =>
-    {
-        let title = prompt('Please enter a new title for your event')
-        let description = prompt('Please give your event a description')
-        // let startTime = prompt("Please give your event's starting time")
-        // let endTime =  prompt("Please give your event's ending time")
-
-        let calendarApi = selectInfo.view.calendar
-
-        calendarApi.unselect()
-
-        if(title)
-        {
-            calendarApi.addEvent
-            ({
-                id: createEventId(),
-                title,
-                start: selectInfo.startStr,
-                end: selectInfo.endStr,
-                allDay: selectInfo.allDay,
-                extendedProps:{
-                    description: description
-                }
-            })
-        }
-    }
-
-    handleEventClick = (clickInfo) =>
-    {
-        // eslint-disable-next-line no-restricted-globals
-        if (confirm(`Are you sure you want to delete the event '${clickInfo.event.title}'`))
-        {
-            clickInfo.event.remove()
-        }
-    }
-
-    handleEvents = (events) =>
-    {
-        this.setState({
-            currentEvents: events
-        })
-    }
-
-
-
+  return (
+    <>
+      <b>{date}</b>
+      <b>
+        <i>{name + ':'}</i>
+      </b>
+      <i>{description}</i>
+    </>
+  );
 }
 
+const style = {
+  position: 'absolute',
+  top: '50%',
+  left: '50%',
+  transform: 'translate(-50%, -50%)',
+  width: 650,
+  bgcolor: 'background.paper',
+  border: '2px solid #000',
+  boxShadow: 24,
+  p: 4,
+};
+
+export default function EventCalendar() {
+  // //This is to let the calendar show weekends, also not needed. User cannot manipulate if weekends are visible
+  // const weekendVisible = useState(true);
+  //This is to show pre-made events
+  const currentEvents = useState([]);
+
+  const [open, setOpen] = React.useState(false);
+  const handleOpen = () => setOpen(true);
+  const handleClose = () => setOpen(false);
+  return (
+    <>
+      <div className="event-calendar">
+        <Button onClick={handleOpen}>Open modal</Button>
+        <Modal
+          open={open}
+          onClose={handleClose}
+          aria-labelledby="modal-modal-title"
+          aria-describedby="modal-modal-description">
+          <Box sx={style}>
+            <div className="event-calendar-main">
+              {/*{this.renderSidebar()}*/}
+              <FullCalendar
+                plugins={[dayGridPlugin, timeGridPlugin, listPlugin, interactionPlugin]}
+                //This is for the toolbar above the calendar.
+                headerToolbar={{
+                  left: 'prev,next today',
+                  center: 'title',
+                  right: 'dayGridWeek dayGridMonth listWeek',
+                }}
+                initialView="dayGridWeek"
+                editable={true}
+                //This allows the dates to be selectable
+                selectable={true}
+                //---------- selectMirror allows the user to see a placeholder when dragging the event
+                selectMirror={true}
+                dayMaxEvents={true}
+                eventMaxStack={true}
+                weekends={true}
+                //If we hardcode any initial events
+                initialEvents={INITIAL_EVENTS}
+                eventContent={RenderEventContent}
+              />
+            </div>
+          </Box>
+        </Modal>
+      </div>
+    </>
+  );
+}
+
+// handleDateSelect = selectInfo => {
+//   let title = prompt('Please enter a new title for your event');
+//   let description = prompt('Please give your event a description');
+//   // let startTime = prompt("Please give your event's starting time")
+//   // let endTime =  prompt("Please give your event's ending time")
+//
+//   let calendarApi = selectInfo.view.calendar;
+//
+//   calendarApi.unselect();
+//
+//   if (title) {
+//     calendarApi.addEvent({
+//       id: createEventId(),
+//       title,
+//       start: selectInfo.startStr,
+//       end: selectInfo.endStr,
+//       allDay: selectInfo.allDay,
+//       extendedProps: {
+//         description: description,
+//       },
+//     });
+//   }
+// };
+// }
