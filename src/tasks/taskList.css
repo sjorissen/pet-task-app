@@ -1,8 +1,14 @@
+
 .header{
     background-color: #1833EB;
-    padding: 30px 40px;
+    /*padding: 30px 40px;*/
+    display: inline-block;
+    width: 100%;
+    line-height: 150px;
+    height: 150px;
     color: white;
     text-align: center;
+    vertical-align: middle;
     font-family: "Courier New";
 }
 
@@ -17,10 +23,11 @@ body.active-modal{
 }
 
 .Add-Btn{
-    padding: 10px 20px;
-    display: block;
-    margin-top: -125px;
-    margin-left: 700px;
+    /*padding: 10px 20px;*/
+    float: right;
+
+    /*margin-top: -125px;*/
+    /*margin-left: 700px;*/
     font-size: 18px;
     font-family: "Courier New";
 }

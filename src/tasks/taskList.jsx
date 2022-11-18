@@ -1,5 +1,7 @@
 //import * as fs from 'fs';
-import { ListItemButton } from '@mui/material';
+import AddCircleIcon from '@mui/icons-material/AddCircle';
+import { Box, IconButton, ListItemButton } from '@mui/material';
+import Button from '@mui/material/Button';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemText from '@mui/material/ListItemText';
@@ -146,13 +148,11 @@ export default function NewTask() {
   return (
     <>
       <div id="myDIV" className="header">
+        <IconButton variant="secondary" onClick={toggleModal} className="Add-Btn">
+          <AddCircleIcon />
+        </IconButton>
         <h2>My Task List</h2>
       </div>
-
-      <button onClick={toggleModal} className="Add-Btn">
-        +
-      </button>
-
       <form onSubmit={handleSubmit}>
         {modal && (
           <div className="modal">
