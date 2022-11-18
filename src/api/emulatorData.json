@@ -1,0 +1,35 @@
+{
+  "users":{
+    "xEctZj50XFE34XzJD18LYVtO5hIb": {
+      "tasks": {
+        "2022-11-15": {
+          "-NGtVoRCyZA8_m2FYju0": {
+            "id": "-NGtVoRCyZA8_m2FYju0",
+            "userid": "?xEctZj50XFE34XzJD18LYVtO5hIb",
+            "name": "Mop floors",
+            "description": "Mop kitchen, dining room, and bathrooms.",
+            "date": "2022-11-15"
+          },
+          "-NGtVoRCyZA8_m2FYju1": {
+            "id": "-NGtVoRCyZA8_m2FYju1",
+            "userid": "?xEctZj50XFE34XzJD18LYVtO5hIb",
+            "name": "Wash dishes",
+            "description": "Wash dishes in sink & dry them",
+            "date": "2022-11-15"
+          }
+        }
+      },
+      "pet": {
+        "userid": "-NGtVoRCyZA8_m2FYju0",
+        "name": "Billy",
+        "species": "cat",
+        "color": "yellow",
+        "age": "child",
+        "health": 50,
+        "maxHealth": 50,
+        "status": "happy",
+        "accessories": []
+      }
+    }
+  }
+}
