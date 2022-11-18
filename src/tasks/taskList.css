@@ -10,11 +10,26 @@ body.active-modal{
     overflow-y:hidden;
 }
 
+.box-c{
+    width:100vw;
+    height: 100vh;
+    position: fixed;
+}
+
 .Add-Btn{
     padding: 10px 20px;
     display: block;
     margin-top: -125px;
-    margin-left: 1475px;
+    margin-left: 700px;
+    font-size: 18px;
+    font-family: "Courier New";
+}
+
+.box{
+    padding: 10px 20px;
+    display: block;
+    margin-top: 100px;
+    margin-left: 500px;
     font-size: 18px;
     font-family: "Courier New";
 }
@@ -27,6 +42,30 @@ body.active-modal{
     right: 0;
     bottom: 0;
     position: fixed;
+}
+
+.edit-modal, .overlay{
+    width: 100vw;
+    height: 100vh;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    position: fixed;
+}
+
+.edit-modal-content{
+    position: absolute;
+    top: 40%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    line-height: 1.4;
+    background: #f1f1f1;
+    padding: 14px 28px;
+    border-radius: 3px;
+    max-width: 600px;
+    min-width: 300px;
+    font-family: "Courier New";
 }
 
 .overlay {
