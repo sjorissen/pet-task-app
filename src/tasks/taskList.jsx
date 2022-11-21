@@ -174,26 +174,32 @@ export default function NewTask() {
 
         <h2>My Task List</h2>
       </div>
+
       <form onSubmit={handleSubmit}>
         {modal && (
           <div className="modal">
             <div onClick={toggleModal} className="overlay"></div>
             <div className="modal-content">
               <h2> New Task</h2>
-              <TextField
-                required
-                onChange={e => setTitle(e.target.value)}
-                id="taskName"
-                label="Task Name:"
-                variant="standard"
-              />
+              <div>
+                <TextField
+                  required
+                  onChange={e => setTitle(e.target.value)}
+                  id="taskName"
+                  label="Task Name:"
+                  variant="standard"
+                />
+              </div>
 
-              <TextField
-                id="description"
-                onChange={e => setDesc(e.target.value)}
-                label="Description:"
-                variant="standard"
-              />
+              <div>
+                <TextField
+                  sx={[{ pb: 5 }]}
+                  id="description"
+                  onChange={e => setDesc(e.target.value)}
+                  label="Description:"
+                  variant="standard"
+                />
+              </div>
 
               <LocalizationProvider dateAdapter={AdapterDayjs}>
                 <DatePicker
