@@ -84,42 +84,35 @@ export default function EventCalendar() {
   }, []);
 
   const tasks = task ? [task] : [];
-  const [open, setOpen] = React.useState(false);
-  const handleOpen = () => setOpen(true);
-  const handleClose = () => setOpen(false);
+  // const [open, setOpen] = React.useState(false);
+  // const handleOpen = () => setOpen(true);
+  // const handleClose = () => setOpen(false);
   return (
     <>
       <div className="event-calendar">
-        <Button onClick={handleOpen}>Open modal</Button>
-        <Modal
-          open={open}
-          onClose={handleClose}
-          aria-labelledby="modal-modal-title"
-          aria-describedby="modal-modal-description">
-          <Box sx={style}>
-            <div className="event-calendar-main">
-              <FullCalendar
-                plugins={[dayGridPlugin, timeGridPlugin, listPlugin, interactionPlugin]}
-                initialView="dayGridWeek"
-                //This is for the toolbar above the calendar.
-                headerToolbar={{
-                  left: 'prev,next today',
-                  center: 'title',
-                  right: 'dayGridWeek dayGridMonth listWeek',
-                }}
-                editable={true}
-                //This allows the dates to be selectable
-                selectable={true}
-                dayMaxEvents={true}
-                eventMaxStack={true}
-                weekends={true}
-                // eslint-disable-next-line @typescript-eslint/no-shadow
-                events={tasks.map(task => ({ title: task.name, start: task.date }))}
-                datesSet={console.debug}
-              />
-            </div>
-          </Box>
-        </Modal>
+        <Box sx={style}>
+          <div className="event-calendar-main">
+            <FullCalendar
+              plugins={[dayGridPlugin, timeGridPlugin, listPlugin, interactionPlugin]}
+              initialView="dayGridWeek"
+              //This is for the toolbar above the calendar.
+              headerToolbar={{
+                left: 'prev,next today',
+                center: 'title',
+                right: 'dayGridWeek dayGridMonth listWeek',
+              }}
+              editable={true}
+              //This allows the dates to be selectable
+              selectable={true}
+              dayMaxEvents={true}
+              eventMaxStack={true}
+              weekends={true}
+              // eslint-disable-next-line @typescript-eslint/no-shadow
+              events={tasks.map(task => ({ title: task.name, start: task.date }))}
+              datesSet={console.debug}
+            />
+          </div>
+        </Box>
       </div>
     </>
   );

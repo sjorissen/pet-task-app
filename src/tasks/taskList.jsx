@@ -1,5 +1,6 @@
 //import * as fs from 'fs';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
+import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import { Box, IconButton, ListItemButton } from '@mui/material';
 import Button from '@mui/material/Button';
 import List from '@mui/material/List';
@@ -7,14 +8,16 @@ import ListItem from '@mui/material/ListItem';
 import ListItemText from '@mui/material/ListItemText';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
+import Modal from '@mui/material/Modal';
 import TextField from '@mui/material/TextField';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import React, { useEffect, useRef, useState } from 'react';
 import Api from '../api/api';
-import './taskList.css';
 import { getTask } from '../api/mocks';
+import EventCalendar from '../calendar/EventCalendar';
+import './taskList.css';
 
 //import Modal from '@mui/material/Modal';
 //import Button from '@mui/material/Button';
@@ -96,6 +99,10 @@ export default function NewTask() {
     setModal(!modal);
   };
 
+  const [openCal, setCal] = useState(false);
+  const handleOpen = () => setCal(true);
+  const handleCloseCal = () => setCal(false);
+
   const handleClickListItem = event => {
     setAnchorEl(event.currentTarget);
   };
@@ -151,6 +158,20 @@ export default function NewTask() {
         <IconButton variant="secondary" onClick={toggleModal} className="Add-Btn">
           <AddCircleIcon />
         </IconButton>
+        <IconButton variant="secondary" onClick={handleOpen} className="Calendar-Btn">
+          <CalendarMonthIcon />
+        </IconButton>
+
+        <Modal
+          open={openCal}
+          onClose={handleCloseCal}
+          aria-labelledby="modal-modal-title"
+          aria-describedby="modal-modal-description">
+          <div>
+            <EventCalendar />
+          </div>
+        </Modal>
+
         <h2>My Task List</h2>
       </div>
       <form onSubmit={handleSubmit}>
@@ -249,6 +270,5 @@ export default function NewTask() {
       </form>
     </>
   );
-
-  function SaveTask() {}
 }
+function SaveTask() {}
