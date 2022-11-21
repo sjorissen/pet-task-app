@@ -3,12 +3,23 @@ WARNING: Illegal reflective access by io.netty.util.internal.ReflectionUtil (fil
 WARNING: Please consider reporting this to the maintainers of io.netty.util.internal.ReflectionUtil
 WARNING: Use --illegal-access=warn to enable warnings of further illegal reflective access operations
 WARNING: All illegal access operations will be denied in a future release
-13:16:03.644 [NamespaceSystem-akka.actor.default-dispatcher-4] INFO akka.event.slf4j.Slf4jLogger - Slf4jLogger started
-13:16:03.804 [main] INFO com.firebase.server.forge.App$ - Listening at 127.0.0.1:9000
-13:16:12.298 [NamespaceSystem-akka.actor.default-dispatcher-4] INFO com.firebase.core.namespace.NamespaceActor - fur-minder-default-rtdb successfully activated FBKV (SurveyIdle(0)) wait: 104ms, init: 0ms
-13:16:12.346 [NamespaceSystem-blocking-namespace-operation-dispatcher-6] INFO com.firebase.core.namespace.StateManager - Namespace fur-minder-default-rtdb status Active to Active
-13:22:43.996 [FirebaseWorkerPool-1-4] WARN com.firebase.core.persistence.backend.dummy.EmulatorMetadataPersistence - Multiple projectIds are not recommended in single project mode. Requested 
-namespace fur-minder, but the emulator is configured for fur-minder-default-rtdb. To 
+14:28:25.877 [NamespaceSystem-akka.actor.default-dispatcher-4] INFO akka.event.slf4j.Slf4jLogger - Slf4jLogger started
+14:28:25.985 [main] INFO com.firebase.server.forge.App$ - Listening at 127.0.0.1:9000
+14:28:33.624 [NamespaceSystem-akka.actor.default-dispatcher-4] INFO com.firebase.core.namespace.NamespaceActor - fur-minder-default-rtdb successfully activated FBKV (SurveyIdle(0)) wait: 89ms, init: 0ms
+14:28:33.677 [NamespaceSystem-blocking-namespace-operation-dispatcher-7] INFO com.firebase.core.namespace.StateManager - Namespace fur-minder-default-rtdb status Active to Active
+15:01:41.867 [FirebaseWorkerPool-1-2] WARN com.firebase.core.persistence.backend.dummy.EmulatorMetadataPersistence - Multiple projectIds are not recommended in single project mode. Requested 
+namespace 127, but the emulator is configured for fur-minder-default-rtdb. To 
 opt-out of single project mode add/set the single_project_mode: false property in 
 the firebase.json emulators config. 
-13:22:44.001 [NamespaceSystem-akka.actor.default-dispatcher-12] INFO com.firebase.core.namespace.NamespaceActor - fur-minder successfully activated FBKV (SurveyIdle(0)) wait: 2ms, init: 0ms
+15:01:41.875 [NamespaceSystem-akka.actor.default-dispatcher-18] INFO com.firebase.core.namespace.NamespaceActor - 127 successfully activated FBKV (SurveyIdle(0)) wait: 4ms, init: 0ms
+15:08:58.732 [FirebaseWorkerPool-1-2] WARN com.firebase.core.persistence.backend.dummy.EmulatorMetadataPersistence - Multiple projectIds are not recommended in single project mode. Requested 
+namespace fur-minder, but the emulator is configured for fur-minder-default-rtdb,127. To 
+opt-out of single project mode add/set the single_project_mode: false property in 
+the firebase.json emulators config. 
+15:08:58.737 [NamespaceSystem-akka.actor.default-dispatcher-32] INFO com.firebase.core.namespace.NamespaceActor - fur-minder successfully activated FBKV (SurveyIdle(0)) wait: 2ms, init: 0ms
+22:20:13.141 [Thread-0] INFO com.firebase.server.forge.App$ - Attempting graceful shutdown.
+22:20:13.146 [NamespaceSystem-akka.actor.default-dispatcher-250] INFO com.firebase.core.namespace.Terminator$Terminator - 3 actors left to terminate: fur-minder, 127, fur-minder-default-rtdb
+22:20:13.149 [NamespaceSystem-akka.actor.default-dispatcher-149] INFO com.firebase.core.namespace.NamespaceActor - stopped namespace actor for fur-minder
+22:20:13.149 [NamespaceSystem-akka.actor.default-dispatcher-249] INFO com.firebase.core.namespace.NamespaceActor - stopped namespace actor for 127
+22:20:13.149 [NamespaceSystem-akka.actor.default-dispatcher-248] INFO com.firebase.core.namespace.NamespaceActor - stopped namespace actor for fur-minder-default-rtdb
+22:20:13.151 [Thread-0] INFO com.firebase.server.forge.App$ - Graceful shutdown complete.

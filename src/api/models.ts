@@ -5,8 +5,8 @@ export type Accessories = 'tophat' | 'bowtie' | 'glasses';
 export type PetColor = 'red' | 'blue' | 'polkadot';
 
 export type PetType = {
-  id: number;
-  userid: number;
+  id: string;
+  userid: string;
   name: string;
   species: Species;
   color: PetColor;

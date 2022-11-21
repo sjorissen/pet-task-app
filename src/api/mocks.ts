@@ -5,8 +5,8 @@ Placeholder data for API functions to grab.
 import { PetType, TaskType } from './models';
 
 export const getPet: PetType = {
-  id: 1,
-  userid: 1,
+  id: '-aslkfjepa',
+  userid: 'xEctZj50XFE34XzJD18LYVtO5hIb',
   name: 'Billy',
   health: 100,
   species: 'cat',

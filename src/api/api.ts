@@ -35,11 +35,18 @@ export default class Api {
 
   /**
    * Gets a pet from the database based on ID
+   * @param userid
    * @param id
    */
-  async getPet(id: number): Promise<PetType> {
+  async getPet(userid: string): Promise<PetType> {
     this.db;
-    return mock.getPet;
+    const path = `users/${userid}/pet`;
+    const snap = await get(ref(this.db, path));
+    if (snap.exists()) {
+      return snap.val() as PetType;
+    } else {
+      throw new Error("couldn't get data");
+    }
   }
 
   /**
@@ -47,8 +54,8 @@ export default class Api {
    * @param userid
    * @param pet
    */
-  async createPet(userid: number, pet: PetType): Promise<void> {
-    set(ref(this.db, 'pets/' + userid), {
+  async createPet(userid: string, pet: PetType): Promise<void> {
+    push(ref(this.db, 'users/' + userid), {
       ...pet,
       userid: userid,
     });
@@ -56,11 +63,13 @@ export default class Api {
 
   /**
    * Updates the pet in the database with the given payload
-   * @param id
+   * @param userid
    * @param pet
    */
-  async updatePet(id: string, pet: Partial<PetType>): Promise<PetType> {
-    return mock.updatePet;
+  async updatePet(userid: string, pet: Partial<PetType>): Promise<void> {
+    await update(ref(this.db, 'users/' + userid + '/pet/' + pet.id), {
+      ...pet,
+    });
   }
 
   /**
@@ -112,13 +121,15 @@ export default class Api {
     }, [] as TaskType[])
   }
 
+  // TODO: add getAllTasks()
+
   /***
    * Overwrites the respective task in the database with its new information.
    * @param userid User who the task belongs to.
    * @param task The updated task.
    */
   async editTask(userid: string, task: TaskType): Promise<void> {
-    await update(ref(this.db, userid + '/tasks/' + task.date + '/' + task.id), {
+    await update(ref(this.db, 'users/' + userid + '/tasks/' + task.date + '/' + task.id), {
       ...task,
     });
   }
