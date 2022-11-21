@@ -1,3 +1,8 @@
+* {
+    margin: 0;
+    padding: 0;
+}
+
 #navbar{
     flex-grow: 1
 }
@@ -13,6 +18,10 @@
 }
 #login{
     color: inherit
+}
+#componentsGrid
+{
+    padding-top: 20px;
 }
 
 .column {
