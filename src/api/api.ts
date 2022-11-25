@@ -91,6 +91,7 @@ export default class Api {
    */
   async getTask(userid: string, date: string, id: string): Promise<TaskType> {
     const path = 'users/' + userid + '/tasks/' + date + '/' + id;
+
     const snap = await get(ref(this.db, path));
     if (snap.exists()) {
       return snap.val() as TaskType;

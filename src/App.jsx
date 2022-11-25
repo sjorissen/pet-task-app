@@ -4,6 +4,7 @@ import EventCalendar from './calendar/EventCalendar';
 // import { NewTask } from './tasks/taskList';
 import './App.css';
 import './styles/mainPage.css';
+import PetView from './pet/petView';
 import NewTask, { TaskToScreen } from './tasks/taskList';
 
 const Item = styled(Paper)(({ theme }) => ({
@@ -42,6 +43,7 @@ function App() {
             </Grid>
             <Grid item xs>
               <Item>xs=6</Item>
+              <PetView />
             </Grid>
           </Grid>
         </Box>
