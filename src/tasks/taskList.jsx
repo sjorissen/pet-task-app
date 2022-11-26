@@ -15,9 +15,11 @@ import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import React, { useEffect, useRef, useState } from 'react';
 import Api from '../api/api';
+import database from '../api/firebase-config';
 import { getTask } from '../api/mocks';
 import EventCalendar from '../calendar/EventCalendar';
 import './taskList.css';
+import { TaskType } from '../api/models';
 
 //import Modal from '@mui/material/Modal';
 //import Button from '@mui/material/Button';
@@ -53,16 +55,23 @@ function getTaskList() {
 
  */
 
-export function TaskToScreen({ taskid }) {
-  const [{ name, description, repeat, done, date }, setTask] = useState({
-    name: '',
-    description: '',
-    repeat: false,
-    done: false,
-    date: '2022-01-01',
+export function TaskToScreen() {
+  // const [task, setTask] = useState({
+  //   name: '',
+  //   description: '',
+  //   repeat: false,
+  //   done: false,
+  //   date: '2022-01-01',
+  // });
+  const [task, setTask] = useState({
+    // ...
   });
+  const { name, description, repeat, done, date } = task;
+  const uid = 'xEctZj50XFE34XzJD18LYVtO5hIb';
+  const taskid = '-NGtVoRCyZA8_m2FYju0';
+  const testdate = '2022-11-15';
 
-  const api = new Api();
+  const api = new Api({ db: database });
   useEffect(() => {
     api.getTask(taskid).then(function (task) {
       setTask(task);
@@ -77,7 +86,7 @@ export function TaskToScreen({ taskid }) {
       <ListItemText primary={name} />
     </ListItemButton>
   );
-
+  console.log(task);
   return <div>{todayTasks}</div>;
 }
 
@@ -86,8 +95,7 @@ export default function NewTask() {
   const [title, setTitle] = useState('');
   const [desc, setDesc] = useState('');
 
-  const [startDate, setStartDate] = useState(new Date());
-  const [endDate, setEndDate] = useState(new Date());
+  const [dueDate, setDueDate] = useState(new Date().toISOString().split('T')[0]);
 
   const [anchorEl, setAnchorEl] = React.useState(null);
   const [selectedIndex, setSelectedIndex] = React.useState(1);
@@ -132,23 +140,24 @@ export default function NewTask() {
   const handleSubmit = e => {
     e.preventDefault();
 
-    let sD = startDate.toString();
-    let eD = endDate.toString();
+    let sD = dueDate.toString();
+    //let eD = endDate.toString();
     let id = 1;
 
     //var taskList = new TaskList();
-    let myTask = new Task(id, title, desc, sD, eD, selectedIndex);
+    let myTask = new Task(id, title, desc, sD, selectedIndex);
 
-    if (title && (desc || !desc) && startDate && endDate && selectedIndex) {
+    if (title && (desc || !desc) && dueDate && selectedIndex) {
       console.log('Task ID: ' + myTask.id);
       console.log('Task name: ' + myTask.name);
       console.log('Description: ' + myTask.desc);
       console.log('Start date: ' + myTask.startD);
-      console.log('End date: ' + myTask.endD);
+      // console.log('End date: ' + myTask.endD);
       console.log('Repetition: ' + myTask.repetition);
       //AddTaskToList(myTask);
     }
     toggleModal();
+    SaveTask({ api }, myTask.name, myTask.desc, myTask.startD, myTask.repetition);
     //TaskToScreen();
   };
 
@@ -171,7 +180,6 @@ export default function NewTask() {
             <EventCalendar />
           </div>
         </Modal>
-
         <h2>My Task List</h2>
       </div>
 
@@ -204,26 +212,12 @@ export default function NewTask() {
               <LocalizationProvider dateAdapter={AdapterDayjs}>
                 <DatePicker
                   required
-                  id="start"
-                  label="Start Date"
+                  id="due"
+                  label="Due Date"
                   dateFormat="MM/dd/yyyy"
                   //selected={startDate}
-                  value={startDate}
-                  onChange={date => date && setStartDate(date)}
-                  renderInput={params => <TextField {...params} />}
-                />
-              </LocalizationProvider>
-
-              <LocalizationProvider dateAdapter={AdapterDayjs}>
-                <DatePicker
-                  required
-                  id="end"
-                  label="End Date"
-                  dateFormat="MM/dd/yyyy"
-                  value={endDate}
-                  onChange={date2 => {
-                    date2 && setEndDate(date2);
-                  }}
+                  value={dueDate}
+                  onChange={date => date && setDueDate(date)}
                   renderInput={params => <TextField {...params} />}
                 />
               </LocalizationProvider>
@@ -267,7 +261,10 @@ export default function NewTask() {
                 Close
               </button>
 
-              <button className="save-modal" onClick={SaveTask()}>
+              <button
+                className="save-modal"
+                //onClick={}
+              >
                 Save
               </button>
             </div>
@@ -277,4 +274,27 @@ export default function NewTask() {
     </>
   );
 }
-function SaveTask() {}
+
+// export type TaskType = {
+//   id: number;
+//   userid: number;
+//   name: string;
+//   description: string;
+//   repeat: boolean;
+//   done: boolean;
+//   date: string;
+// };
+
+function SaveTask({ api }, title, desc, dueDate, selectedIndex) {
+  const task = {
+    id: '',
+    userid: 'xEctZj50XFE34XzJD18LYVtO5hIb',
+    name: title,
+    description: desc,
+    repeat: false,
+    done: false,
+    date: dueDate,
+  };
+
+  api.addTask('xEctZj50XFE34XzJD18LYVtO5hIb', task);
+}

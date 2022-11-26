@@ -16,40 +16,39 @@ const Item = styled(Paper)(({ theme }) => ({
 }));
 
 function App() {
-  {
-    return (
-      // eslint-disable-next-line react/jsx-filename-extension
-      <div>
-        {/* // ==================== This is for the top navbar ===================
+  return (
+    // eslint-disable-next-line react/jsx-filename-extension
+    <div>
+      {/* // ==================== This is for the top navbar ===================
      // eslint-disable-next-line react/jsx-filename-extension */}
-        {/*//==================== This is for the top navbar =================== //*/}
-        {/*eslint-disable-next-line react/jsx-filename-extension*/}
-        <Box id="navbar">
-          <AppBar id="appBar">
-            <Toolbar>
-              <Typography id="furryMinder" variant="h6" component="div">
-                Furry-Minder
-              </Typography>
-              <Button id="login">Login</Button>
-            </Toolbar>
-          </AppBar>
-        </Box>
+      {/*//==================== This is for the top navbar =================== //*/}
+      {/*eslint-disable-next-line react/jsx-filename-extension*/}
+      <Box id="navbar">
+        <AppBar id="appBar">
+          <Toolbar>
+            <Typography id="furryMinder" variant="h6" component="div">
+              Furry-Mind
+            </Typography>
+            <Button id="login">Login</Button>
+          </Toolbar>
+        </AppBar>
+      </Box>
 
-        <Box id="componentsGrid" sx={{ flexGrow: 1 }}>
-          <Grid container spacing={2}>
-            <Grid item xs={4}>
-              <NewTask />
-              {/*<Item>xs = 4</Item>*/}
-            </Grid>
-            <Grid item xs>
-              <Item>xs=6</Item>
-              <PetView />
-            </Grid>
+      <Box id="componentsGrid" sx={{ flexGrow: 1 }}>
+        <Grid container spacing={2}>
+          <Grid item xs={4}>
+            <NewTask />
+            <TaskToScreen />
+            {/*<Item>xs = 4</Item>*/}
           </Grid>
-        </Box>
-      </div>
-    );
-  }
+          <Grid item xs>
+            <Item>xs=6</Item>
+            <PetView />
+          </Grid>
+        </Grid>
+      </Box>
+    </div>
+  );
 
   // eslint-disable-next-line react/jsx-filename-extension
   //return <EventCalendar />;
