@@ -77,8 +77,8 @@ export default class Api {
    * @param userid
    * @param task
    */
-  async addTask(userid: string, task: TaskType) {
-    push(ref(this.db, userid + '/tasks/' + task.date), {
+  async addTask(userid: string, task: Omit<TaskType, "id">) {
+    push(ref(this.db, 'users/' + userid + '/tasks/' + task.date), {
       ...task,
     });
   }
