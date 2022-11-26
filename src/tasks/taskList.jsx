@@ -151,7 +151,17 @@ export default function NewTask() {
     toggleModal();
     //TaskToScreen();
   };
-
+  const style = {
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
+    width: 750,
+    bgcolor: 'background.paper',
+    border: '5px solid #175BA6',
+    boxShadow: 24,
+    p: 4,
+  };
   return (
     <>
       <div id="myDIV" className="header">
@@ -175,7 +185,7 @@ export default function NewTask() {
         <h2>My Task List</h2>
       </div>
 
-      <form onSubmit={handleSubmit}>
+      <form class="form" onSubmit={handleSubmit}>
         {modal && (
           <div className="modal">
             <div onClick={toggleModal} className="overlay"></div>
