@@ -1,8 +1,8 @@
 export type Species = 'cat' | 'dog' | 'pika';
 export type PetStatus = 'happy' | 'sad' | 'dead';
-export type PetAge = 'child' | 'teen' | 'adult';
+export type PetStage = 'child' | 'teen' | 'adult';
 export type Accessories = 'tophat' | 'bowtie' | 'glasses';
-export type PetColor = 'red' | 'blue' | 'polkadot';
+export type PetColor = 'red' | 'blue' | 'yellow' | 'green' | 'polkadot' | 'void';
 
 export type PetType = {
   id: string;
@@ -10,7 +10,7 @@ export type PetType = {
   name: string;
   species: Species;
   color: PetColor;
-  age: PetAge;
+  stage: PetStage;
   health: number;
   status: PetStatus;
   accessories: Accessories[];
@@ -18,8 +18,8 @@ export type PetType = {
 };
 
 export type TaskType = {
-  id: number;
-  userid: number;
+  id: string;
+  userid: string;
   name: string;
   description: string;
   repeat: boolean;

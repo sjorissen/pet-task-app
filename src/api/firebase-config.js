@@ -1,4 +1,5 @@
 import { initializeApp } from 'firebase/app';
+import { connectAuthEmulator, getAuth } from 'firebase/auth';
 import { connectDatabaseEmulator, getDatabase } from 'firebase/database';
 
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
@@ -16,10 +17,12 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 
 // Initialize Realtime Database and get a reference to the service
-const database = getDatabase();
+export const database = getDatabase(app);
+export const auth = getAuth(app);
 if (window.location.hostname === 'localhost') {
   // Point to the RTDB emulator running on localhost.
   connectDatabaseEmulator(database, 'localhost', 9000);
+  connectAuthEmulator(auth, 'http://localhost:9099');
 }
 
 export default database;
