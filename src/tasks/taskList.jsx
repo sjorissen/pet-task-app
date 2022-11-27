@@ -16,10 +16,10 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import React, { useEffect, useRef, useState } from 'react';
 import Api from '../api/api';
 import database from '../api/firebase-config';
-import { getTask } from '../api/mocks';
+//import { getTask } from '../api/mocks';
+import { TaskType } from '../api/models';
 import EventCalendar from '../calendar/EventCalendar';
 import './taskList.css';
-import { TaskType } from '../api/models';
 
 //import Modal from '@mui/material/Modal';
 //import Button from '@mui/material/Button';
@@ -63,37 +63,50 @@ export function TaskToScreen() {
   //   done: false,
   //   date: '2022-01-01',
   // });
-  const [task, setTask] = useState({
-    // ...
-  });
-  const { name, description, repeat, done, date } = task;
+  const [tasks, setTasks] = useState([]);
+
   const uid = 'xEctZj50XFE34XzJD18LYVtO5hIb';
   const taskid = '-NGtVoRCyZA8_m2FYju0';
   const testdate = '2022-11-15';
 
   const api = new Api({ db: database });
-  const [todayTaskss, setTodayTasks] = useState([]);
+
+  const fetchAndDisplayTasks = (userid, date) => {
+    api
+      .getTasksByDate(userid, date)
+      .then(function (_tasks) {
+        setTasks(_tasks);
+      })
+      .catch(console.warn);
+  };
+
   useEffect(() => {
-    api.getTask(taskid).then(function (task) {
-      setTask(task);
-    });
-  }, [taskid]);
+    fetchAndDisplayTasks(uid, testdate);
+  }, [uid, testdate, taskid]);
 
-  const todayTasks = [];
-  // let task = api.getTask(1);
-  for (let i = 0; i < api.getTasksByDate(uid, testdate).length; i++) {
-    todayTasks.push(
-      <ListItemButton>
-        <ListItemText primary={name} />
-      </ListItemButton>
-    );
-  }
+  window.api = api;
 
-  console.log(task);
-  return <div> {todayTasks}</div>;
+  console.log(tasks);
+  return (
+    <>
+      <NewTask
+        onCreate={() => {
+          fetchAndDisplayTasks(uid, testdate);
+        }}
+      />
+      <ul>
+        {tasks.map(task => (
+          <ListItemButton>
+            <ListItemText primary={task.name} />
+            {/*key={task.id}>{task.name}*/}
+          </ListItemButton>
+        ))}
+      </ul>
+    </>
+  );
 }
 
-export default function NewTask() {
+export default function NewTask({ onCreate = () => {} }) {
   const [modal, setModal] = useState(false);
   const [title, setTitle] = useState('');
   const [desc, setDesc] = useState('');
@@ -105,6 +118,8 @@ export default function NewTask() {
   const open = Boolean(anchorEl);
 
   const options = ['Choose an Option:', 'Daily', 'Weekly', 'None'];
+
+  const api = new Api({ db: database });
 
   const toggleModal = () => {
     setModal(!modal);
@@ -143,7 +158,7 @@ export default function NewTask() {
   const handleSubmit = e => {
     e.preventDefault();
 
-    let sD = dueDate.toString();
+    let sD = dueDate.toISOString().split('T')[0];
     //let eD = endDate.toString();
     let id = 1;
 
@@ -160,7 +175,21 @@ export default function NewTask() {
       //AddTaskToList(myTask);
     }
     toggleModal();
-    SaveTask({ api }, myTask.name, myTask.desc, myTask.startD, myTask.repetition);
+
+    const task = {
+      id: '',
+      userid: 'xEctZj50XFE34XzJD18LYVtO5hIb',
+      name: myTask.name,
+      description: myTask.desc,
+      repeat: false,
+      done: false,
+      date: myTask.startD,
+    };
+
+    api.addTask(task.userid, task).then(() => {
+      onCreate();
+    });
+    // SaveTask({ api }, myTask.name, myTask.desc, myTask.startD, myTask.repetition);
     //TaskToScreen();
   };
 
