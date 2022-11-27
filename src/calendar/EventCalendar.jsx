@@ -9,6 +9,8 @@ import Modal from '@mui/material/Modal';
 import moment from 'moment';
 import React, { useEffect, useState } from 'react';
 import Api from '../api/api';
+import database from '../api/firebase-config';
+
 /* let testTitle = testTask.name;
 
   let testDescription = testTask.description;
@@ -71,8 +73,8 @@ const style = {
   p: 4,
 };
 
-export default function EventCalendar() {
-  const api = new Api();
+export default function EventCalendar({}) {
+  const api = new Api({ db: database });
 
   const [task, setTask] = useState(null);
 
