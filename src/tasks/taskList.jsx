@@ -72,6 +72,7 @@ export function TaskToScreen() {
   const testdate = '2022-11-15';
 
   const api = new Api({ db: database });
+  const [todayTaskss, setTodayTasks] = useState([]);
   useEffect(() => {
     api.getTask(taskid).then(function (task) {
       setTask(task);
@@ -80,14 +81,16 @@ export function TaskToScreen() {
 
   const todayTasks = [];
   // let task = api.getTask(1);
+  for (let i = 0; i < api.getTasksByDate(uid, testdate).length; i++) {
+    todayTasks.push(
+      <ListItemButton>
+        <ListItemText primary={name} />
+      </ListItemButton>
+    );
+  }
 
-  todayTasks.push(
-    <ListItemButton>
-      <ListItemText primary={name} />
-    </ListItemButton>
-  );
   console.log(task);
-  return <div>{todayTasks}</div>;
+  return <div> {todayTasks}</div>;
 }
 
 export default function NewTask() {
