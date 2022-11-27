@@ -1,0 +1,11 @@
+.app {
+  min-height: 100vh;
+
+  .navbar {
+    height: 60px;
+  }
+
+  .main {
+    min-height: calc(100vh - 60px);
+  }
+}

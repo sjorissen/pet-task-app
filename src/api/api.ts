@@ -11,14 +11,9 @@ import {
   endAt,
   query,
 } from 'firebase/database';
-import * as mock from './mocks';
-import { getTask } from './mocks';
 import { PetType, TaskType } from './models';
-import { QueryConstraintType } from '@firebase/database';
 
 export default class Api {
-  private mocked = false;
-
   private readonly _db?: Database;
 
   get db(): Database {
@@ -27,16 +22,14 @@ export default class Api {
   }
 
   constructor(
-    { db, mocked }: { db?: Database; mocked?: boolean } = { db: undefined, mocked: false }
+    { db }: { db?: Database } = { db: undefined }
   ) {
     this._db = db;
-    this.mocked = mocked ?? false;
   }
 
   /**
    * Gets a pet from the database based on ID
    * @param userid
-   * @param id
    */
   async getPet(userid: string): Promise<PetType> {
     this.db;
@@ -55,7 +48,7 @@ export default class Api {
    * @param pet
    */
   async createPet(userid: string, pet: PetType): Promise<void> {
-    push(ref(this.db, 'users/' + userid), {
+    await set(ref(this.db, `users/${userid}/pet`), {
       ...pet,
       userid: userid,
     });
@@ -67,7 +60,7 @@ export default class Api {
    * @param pet
    */
   async updatePet(userid: string, pet: Partial<PetType>): Promise<void> {
-    await update(ref(this.db, 'users/' + userid + '/pet/' + pet.id), {
+    await update(ref(this.db, 'users/' + userid + '/pet'), {
       ...pet,
     });
   }
@@ -77,8 +70,8 @@ export default class Api {
    * @param userid
    * @param task
    */
-  async addTask(userid: string, task: TaskType) {
-    push(ref(this.db, userid + '/tasks/' + task.date), {
+  async addTask(userid: string, task: Omit<TaskType, "id">) {
+    push(ref(this.db, 'users/' + userid + '/tasks/' + task.date), {
       ...task,
     });
   }
