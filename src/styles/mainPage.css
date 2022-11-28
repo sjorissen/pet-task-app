@@ -2,7 +2,10 @@
     margin: 0;
     padding: 0;
 }
-
+#logoMan{
+height: 50px;
+    width: 50px;
+}
 #navbar{
     flex-grow: 1;
     border-bottom: solid 5px #175BA6;
@@ -14,11 +17,16 @@
 
 #furryMinder{
     flex-grow: 1;
+    font-family: "Courier New";
     display: flex;
+
     justify-content: center;
+    text-align: center;
 }
 #login{
-    color: inherit
+
+    color: inherit;
+    border: solid 5px #175BA6;
 }
 #componentsGrid
 {

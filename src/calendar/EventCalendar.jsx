@@ -58,7 +58,6 @@ function TaskInfo({ taskInfo }) {
 //     </>
 //   )
 // }
-
 //const displayDate2 = new Date('2022/11/16');
 
 const style = {

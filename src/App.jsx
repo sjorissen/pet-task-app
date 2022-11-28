@@ -5,46 +5,40 @@ import EventCalendar from './calendar/EventCalendar';
 // import { NewTask } from './tasks/taskList';
 import './App.css';
 import './styles/mainPage.css';
+import Layout from './components/Layout';
+import logo from './logo/logoMan.png';
 import PetView from './pet/petView';
 import NewTask, { TaskToScreen } from './tasks/taskList';
+
+const Item = styled(Paper)(({ theme }) => ({
+  backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
+  ...theme.typography.body2,
+  padding: theme.spacing(1),
+  textAlign: 'center',
+  color: theme.palette.text.secondary,
+}));
 
 function App() {
   {
     return (
-      // eslint-disable-next-line react/jsx-filename-extension
-      <div>
-        {/* // ==================== This is for the top navbar ===================
-     // eslint-disable-next-line react/jsx-filename-extension */}
-        {/*//==================== This is for the top navbar =================== //*/}
-        {/*eslint-disable-next-line react/jsx-filename-extension*/}
-        <Box id="navbar">
-          <AppBar id="appBar">
-            <Toolbar>
-              <Typography id="furryMinder" variant="h6" component="div">
-                Furry-Minder
-              </Typography>
-              <Button id="login">Login</Button>
-            </Toolbar>
-          </AppBar>
-        </Box>
-
+      <Layout>
         <Box id="componentsGrid" sx={{ flexGrow: 1, height: '90.5vh' }}>
-          <Grid container spacing={6} p={3}>
-            <Grid item xs={4}>
-              <NewTask />
+          <Grid container spacing={2}>
+            <Grid item xs={4} sx={{ ml: 5 }}>
+              <TaskToScreen />
               {/*<Item>xs = 4</Item>*/}
             </Grid>
-            <Grid item xs>
+            <Grid item xs={2}></Grid>
+            <Grid item xs sx={{ mr: 5 }}>
               <PetView />
             </Grid>
           </Grid>
         </Box>
-      </div>
+      </Layout>
     );
+
+    // eslint-disable-next-line react/jsx-filename-extension
+    //return <EventCalendar />;
   }
-
-  // eslint-disable-next-line react/jsx-filename-extension
-  //return <EventCalendar />;
 }
-
 export default App;

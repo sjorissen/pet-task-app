@@ -1,7 +1,7 @@
 //import * as fs from 'fs';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
-import { Box, IconButton, ListItemButton } from '@mui/material';
+import { Box, Divider, IconButton, ListItemButton } from '@mui/material';
 import Button from '@mui/material/Button';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
@@ -87,6 +87,7 @@ export function TaskToScreen() {
   window.api = api;
 
   console.log(tasks);
+
   return (
     <>
       <NewTask
@@ -94,14 +95,20 @@ export function TaskToScreen() {
           fetchAndDisplayTasks(uid, testdate);
         }}
       />
-      <ul>
-        {tasks.map(task => (
-          <ListItemButton>
-            <ListItemText primary={task.name} />
-            {/*key={task.id}>{task.name}*/}
-          </ListItemButton>
-        ))}
-      </ul>
+      <div id="tasks">
+        <ul>
+          {tasks.map(task => (
+            <>
+              <ListItemButton sx={{}}>
+                <ListItemText primary={task.name} />
+
+                {/*key={task.id}>{task.name}*/}
+              </ListItemButton>
+              <Divider />
+            </>
+          ))}
+        </ul>
+      </div>
     </>
   );
 }
@@ -192,17 +199,7 @@ export default function NewTask({ onCreate = () => {} }) {
     // SaveTask({ api }, myTask.name, myTask.desc, myTask.startD, myTask.repetition);
     //TaskToScreen();
   };
-  const style = {
-    position: 'absolute',
-    top: '50%',
-    left: '50%',
-    transform: 'translate(-50%, -50%)',
-    width: 750,
-    bgcolor: 'background.paper',
-    border: '5px solid #175BA6',
-    boxShadow: 24,
-    p: 4,
-  };
+
   return (
     <>
       <div id="myDIV" className="header">
@@ -229,6 +226,7 @@ export default function NewTask({ onCreate = () => {} }) {
         {modal && (
           <div className="modal">
             <div onClick={toggleModal} className="overlay"></div>
+
             <div className="modal-content">
               <h2> New Task</h2>
               <div>

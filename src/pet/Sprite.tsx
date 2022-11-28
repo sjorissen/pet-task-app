@@ -25,6 +25,7 @@ const PETS: Record<PetColor, Record<PetStatus, Record<PetStage, any>>> = {
       adult: adultgreenhappy,
     },
   },
+
   blue: {
     happy: {
       child: childbluehappy,
