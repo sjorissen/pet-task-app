@@ -63,8 +63,8 @@ export default function PetView() {
   const updatePet = _pet => {
     console.debug(_pet);
     api
-      .updatePet(userid, pet)
-      .then(() => setPet(pet))
+      .updatePet(userid, _pet)
+      .then(() => setPet(_pet))
       .catch(console.error);
   };
 
