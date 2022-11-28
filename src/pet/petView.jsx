@@ -1,46 +1,72 @@
 import CheckroomIcon from '@mui/icons-material/Checkroom';
-import {
-  Alert,
-  Box,
-  Grid,
-  IconButton,
-  Input,
-  InputLabel,
-  LinearProgress,
-  Select,
-} from '@mui/material';
+import { Alert, Box, IconButton, LinearProgress, TextField, Typography } from '@mui/material';
 import Button from '@mui/material/Button';
-import Modal from '@mui/material/Modal';
+import clsx from 'clsx';
 import { useEffect, useState } from 'react';
 import Api from '../api/api';
 import database from '../api/firebase-config';
-import styles from './petView.module.css';
+import formStyles from '../components/Forms.module.scss';
+import Modal from '../components/Modal';
+import styles from './petView.module.scss';
 import { Sprite } from './Sprite';
 
-export default function PetView({ src }) {
-  const [{ name, species, color, age, health, status, accessories }, setPet] = useState({
+function calcHealth({ stage, health }) {
+  let [percentage, max] = [0, 100];
+  switch (stage) {
+    case 'child':
+      [percentage, max] = [Math.round((health / 50) * 100), 50];
+      break;
+    case 'teen':
+      [percentage, max] = [Math.round((health / 75) * 100), 75];
+      break;
+    default:
+      [percentage, max] = [Math.round((health / 100) * 100), 100];
+      break;
+  }
+  return [
+    percentage,
+    health,
+    max,
+    percentage <= 30 ? styles.low : percentage <= 50 ? styles.medium : styles.high,
+  ];
+}
+
+export default function PetView() {
+  const [pet, setPet] = useState({
     name: '',
     species: 'cat',
     color: 'green',
-    age: 'child',
+    stage: 'child',
     health: 100,
     status: 'happy',
     accessories: [],
   });
+  const { name, species, color, stage, status, accessories } = pet;
+
+  const [percent, current, max, healthClass] = calcHealth(pet);
+
+  console.log(percent, current, max);
 
   const userid = 'xEctZj50XFE34XzJD18LYVtO5hIb';
   const id = '-aslkfjepa';
 
   const api = new Api({ db: database });
   useEffect(() => {
-    api.getPet(userid, id).then(function (pet) {
-      setPet(pet);
+    api.getPet(userid, id).then(function (_pet) {
+      setPet(_pet);
     });
   }, [userid, id]);
 
   const [open, setOpen] = useState(false);
   const handleOpen = () => setOpen(true);
-  const handleClose = () => setOpen(false);
+  const handleClose = () => setOpen(prevState => !prevState);
+  const updatePet = _pet => {
+    console.debug(_pet);
+    api
+      .updatePet(userid, pet)
+      .then(() => setPet(pet))
+      .catch(console.error);
+  };
 
   return (
     <>
@@ -50,84 +76,92 @@ export default function PetView({ src }) {
             <h2>{name}</h2>
           </Box>
           <Box className={styles.spriteContainer}>
-            <Sprite color={color} status={status} age={age} />
+            <Sprite color={color} status={status} stage={stage} />
           </Box>
           <Box className={styles.petViewBottom}>
-            <Box className={styles.healthWrapper}>
+            <Box className={clsx(styles.healthWrapper, healthClass)}>
               <LinearProgress
+                color="primary"
                 variant="determinate"
-                value={health}
-                className={styles.health}
+                value={percent}
+                className={styles.healthBar}
                 sx={{ height: 40 }}
               />
+              <div className={styles.healthLabel}>HP </div>
+
+              <div className={styles.healthValue}>
+                {current}/{max}
+              </div>
             </Box>
-            <IconButton onClick={handleOpen}>
+            <IconButton onClick={handleOpen} className={styles.customButton}>
               <CheckroomIcon />
             </IconButton>
           </Box>
         </Box>
       )}
-      <Modal
-        open={open}
-        onClose={handleClose}
-        sx={{
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-        }}>
-        <CustomizationMenu name={name} />
+      <Modal open={open} onClose={handleClose}>
+        <CustomizationMenu pet={pet} petUpdate={updatePet} />
       </Modal>
     </>
   );
 }
 
-function CustomizationMenu({ name }) {
+function CustomizationMenu({ pet, petUpdate }) {
   const [error, setError] = useState(null);
+
+  // const handleName = event => {
+  //   setName(event.target);
+  // };
 
   const onSubmit = event => {
     event.preventDefault();
     setError(null);
 
-    const { name } = Object.fromEntries(new FormData(event.target));
+    const update = Object.fromEntries(new FormData(event.target));
+    console.debug(update);
+    petUpdate({ ...pet, ...update });
   };
-
-  // const [color, setColor] = useState('');
-  // const handleChange = event => {
-  //   setColor(event.target.value);
-  // };
+  // return <h1>sup</h1>;
 
   return (
-    <Box
-      sx={{
-        position: 'absolute',
-        top: '50%',
-        left: '50%',
-        width: 400,
-        border: 2,
-        boxShadow: 24,
-        p: 4,
-      }}>
-      <form onSubmit={onSubmit}>
+    <Box className={styles.formContainer}>
+      <form onSubmit={onSubmit} className={formStyles.form}>
         {error && <Alert severity="error">Something bad: {error}</Alert>}
-        <InputLabel htmlFor="name">Pet Name:</InputLabel>
-        <Input name="name" aria-describedby="Pet Name" defaultValue={name} /> <br />
-        {/*<Select*/}
-        {/*  labelId="species"*/}
-        {/*  id="species"*/}
-        {/*  value={species}*/}
-        {/*  label="Species"*/}
-        {/*  onChange={handleChange}*/}
-        {/*  >*/}
-        {/*  <MenuItem value={cat}>Cat</MenuItem>*/}
-        {/*  <MenuItem value={dog}>Dog</MenuItem>*/}
-        {/*  <MenuItem value={virus}>Virus</MenuItem>*/}
-        {/*</Select>*/}
-        {/*<Select labelId="color" id="color" value={color} label="Color" onChange={handleChange}>*/}
-        {/*  <MenuItem value={red}>Red</MenuItem>*/}
-        {/*  <MenuItem value={yellow}>Yellow</MenuItem value={yellow}>*/}
-        {/*  <MenuItem value={blue}>Blue</MenuItem>*/}
-        {/*</Select>*/}
-        <Button variant="submit" type="submit">
+        <Typography variant="h3" className={formStyles.heading}>
+          Customize Pet
+        </Typography>
+        <TextField
+          defaultValue={pet.name}
+          variant="outlined"
+          label="Pet Name"
+          name="name"
+          type="text"
+          size="small"
+          required
+        />
+        <TextField
+          value={`${pet.age} days old`}
+          variant="outlined"
+          label="Pet Age"
+          type="text"
+          size="small"
+        />
+        <TextField
+          select
+          SelectProps={{ native: true }}
+          defaultValue={pet.color}
+          variant="outlined"
+          label="Pet Color"
+          name="color"
+          size="small">
+          <option value="yellow">Yellow</option>
+          <option value="blue">Blue</option>
+          <option value="green">Green</option>
+          <option value="red">Red</option>
+          <option value="void">Void</option>
+        </TextField>
+        {/* TODO: change pet species */}
+        <Button variant="contained" type="submit">
           Submit
         </Button>
       </form>

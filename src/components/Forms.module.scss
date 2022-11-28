@@ -1,0 +1,19 @@
+.form {
+  //width: min(98%, 30rem);
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 1.5rem;
+  padding: 2rem;
+  //background-color: #D3D3D3;
+
+  .heading {
+    align-self: center;
+    color: #1c74d4;
+  }
+
+  :global(.MuiButton-containedPrimary) {
+    background-color: #1c74d4;
+  }
+
+}
