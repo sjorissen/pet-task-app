@@ -15,9 +15,16 @@
     align-items: stretch;
     gap: 3rem;
     padding: 2rem;
+    border: solid 5px #175BA6;
+    border-radius: 10px 10px 0 0;
 
     .heading {
       align-self: center;
+      color: #1c74d4;
+    }
+
+    :global(.MuiButton-containedPrimary) {
+      background-color: #1c74d4;
     }
   }
 

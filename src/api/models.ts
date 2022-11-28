@@ -2,7 +2,7 @@ export type Species = 'cat' | 'dog' | 'pika';
 export type PetStatus = 'happy' | 'sad' | 'dead';
 export type PetStage = 'child' | 'teen' | 'adult';
 export type Accessories = 'tophat' | 'bowtie' | 'glasses';
-export type PetColor = 'red' | 'blue' | 'yellow' | 'green' | 'polkadot' | 'void';
+export type PetColor = 'red' | 'blue' | 'yellow' | 'green' | 'void';
 
 export type PetType = {
   id: string;

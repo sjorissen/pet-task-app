@@ -1,0 +1,115 @@
+$spriteWidth: 70%;
+$spriteMaxWidth: 25rem;
+
+.petView {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    padding-bottom: 2rem;
+
+    .petName {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 1.5rem;
+        color: #175BA6;
+        //border: solid 1px red;
+    }
+
+    .spriteContainer {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: $spriteWidth;
+        max-width: $spriteMaxWidth;
+        //border: solid 1px black;
+    }
+
+    .petViewBottom {
+        display: flex;
+        justify-content: space-between;
+        width: $spriteWidth;
+        max-width: $spriteMaxWidth;
+        //border: solid 1px blue;
+        font-family: 'Press Start 2P', cursive;
+
+        .healthWrapper {
+            flex: 0 0 80%;
+            width: 100%;
+            min-width: 0;
+            position: relative;
+
+            .healthLabel {
+                //flex: 0 0 10%;
+                font-size: 2rem;
+                position: absolute;
+                top: 0.2rem;
+                left: 0.4rem;
+                color: rgba(11, 62, 121, 0.68);
+                //opacity: .8;
+            }
+
+            .healthBar {
+                height: 100%;
+                width: 100%;
+                border-radius: 10px;
+                border: solid 2px #1c74d4;
+            }
+
+            .healthValue {
+                margin-top: 0.2rem;
+                display: flex;
+                justify-content: flex-end;
+            }
+        }
+
+        .customButton {
+            flex: 0 0 10%;
+            //background-color: #1c74d4;
+            color: #1c74d4;
+        }
+
+        /* Apply different colors to the health bar based on the pet's
+            health status. */
+        :global(.MuiLinearProgress-colorPrimary) {
+            background-color: gray;
+        }
+
+        .low {
+            :global(.MuiLinearProgress-barColorPrimary) {
+                background-color: rgb(246, 42, 42);
+            }
+            .healthBar {
+                border: solid 2px rgb(155, 1, 1);
+            }
+            .healthLabel {
+                color: rgba(155, 1, 1, 0.7);
+            }
+        }
+
+        .medium {
+            :global(.MuiLinearProgress-barColorPrimary) {
+                background-color: yellow;
+            }
+            .healthBar {
+                border: solid 2px rgba(248, 168, 0, 1);
+            }
+            .healthLabel {
+                color: rgba(248, 168, 0, 0.7);
+            }
+        }
+
+        .high {
+            :global(.MuiLinearProgress-barColorPrimary) {
+                background-color: dodgerblue;
+            }
+        }
+    }
+}
+
+.formContainer {
+    //width:
+}

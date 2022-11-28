@@ -24,9 +24,9 @@
         "name": "Billy",
         "species": "cat",
         "color": "yellow",
-        "age": "child",
+        "stage": "child",
+        "age": 1,
         "health": 50,
-        "maxHealth": 50,
         "status": "happy",
         "accessories": []
       }
