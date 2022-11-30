@@ -23,13 +23,13 @@ function App() {
     return (
       <Layout>
         <Box id="componentsGrid" sx={{ flexGrow: 1, height: '90.5vh' }}>
-          <Grid container spacing={2}>
-            <Grid item xs={4} sx={{ ml: 5 }}>
+          <Grid container spacing={2} sx={{ p: 5, justifyContent: 'center' }}>
+            <Grid item xs={3}>
               <TaskToScreen />
               {/*<Item>xs = 4</Item>*/}
             </Grid>
-            <Grid item xs={2}></Grid>
-            <Grid item xs sx={{ mr: 5 }}>
+            <Grid item xs={1}></Grid>
+            <Grid item xs={5} sx={{ justifyContent: 'center' }}>
               <PetView />
             </Grid>
           </Grid>

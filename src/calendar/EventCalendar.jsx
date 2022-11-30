@@ -6,6 +6,7 @@ import listPlugin from '@fullcalendar/list';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import { Box, Button } from '@mui/material';
 import Modal from '@mui/material/Modal';
+import { getAuth } from 'firebase/auth';
 import moment from 'moment';
 import React, { useEffect, useState } from 'react';
 import Api from '../api/api';
@@ -72,19 +73,31 @@ const style = {
   p: 4,
 };
 
-export default function EventCalendar({}) {
+export default function EventCalendar() {
   const api = new Api({ db: database });
+  //--------------- GET CURRENT USER ---------------
+  const user = auth.currentUser;
+  console.log({ user });
+  //--------------- GET CURRENT USER ---------------
 
-  const [task, setTask] = useState(null);
+  const [tasks, setTasks] = useState([]);
+  const [daterange, setDaterange] = useState([]);
 
   useEffect(() => {
-    // eslint-disable-next-line @typescript-eslint/no-shadow
-    api.getTask(1).then(function (task) {
-      setTask(task);
-    });
-  }, []);
+    if (!daterange.length) return;
+    const start = daterange[0].toISOString().slice(0, 10);
+    const end = daterange[1].toISOString().slice(0, 10);
+    console.log({ start, end });
+    api
+      .getTasksByDate(user.uid, start, end)
+      .then(tasks => {
+        setTasks(tasks);
+      })
+      .catch(console.error);
+  }, [daterange]);
 
-  const tasks = task ? [task] : [];
+  console.log({ tasks });
+
   // const [open, setOpen] = React.useState(false);
   // const handleOpen = () => setOpen(true);
   // const handleClose = () => setOpen(false);
@@ -110,7 +123,7 @@ export default function EventCalendar({}) {
               weekends={true}
               // eslint-disable-next-line @typescript-eslint/no-shadow
               events={tasks.map(task => ({ title: task.name, start: task.date }))}
-              datesSet={console.debug}
+              datesSet={({ start, end }) => setDaterange([start, end])}
             />
           </div>
         </Box>
