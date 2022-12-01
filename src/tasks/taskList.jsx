@@ -13,13 +13,16 @@ import TextField from '@mui/material/TextField';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { getAuth } from 'firebase/auth';
 import React, { useEffect, useRef, useState } from 'react';
 import Api from '../api/api';
-import database from '../api/firebase-config';
 //import { getTask } from '../api/mocks';
-import { TaskType } from '../api/models';
+//import { TaskType } from '../api/models';
+import database, { auth } from '../api/firebase-config';
 import EventCalendar from '../calendar/EventCalendar';
 import './taskList.css';
+// eslint-disable-next-line import/order
+import { CheckBox } from '@mui/icons-material';
 
 //import Modal from '@mui/material/Modal';
 //import Button from '@mui/material/Button';
@@ -65,11 +68,18 @@ export function TaskToScreen() {
   // });
   const [tasks, setTasks] = useState([]);
 
-  const uid = 'xEctZj50XFE34XzJD18LYVtO5hIb';
+  const user = auth.currentUser;
+  const uid = user.uid;
   const taskid = '-NGtVoRCyZA8_m2FYju0';
-  const testdate = '2022-11-15';
+
+  let today = new Date();
+  let start = today.toISOString().slice(0, 10);
+  console.log(start);
+  const testdate = start;
 
   const api = new Api({ db: database });
+
+  console.log({ user });
 
   const fetchAndDisplayTasks = (userid, date) => {
     api
@@ -77,6 +87,7 @@ export function TaskToScreen() {
       .then(function (_tasks) {
         setTasks(_tasks);
       })
+
       .catch(console.warn);
   };
 
@@ -88,6 +99,12 @@ export function TaskToScreen() {
 
   console.log(tasks);
 
+  const handleChecked = (event, idx) => {
+    tasks[idx].done = !event.target.checked;
+    setTasks(tasks);
+    //api.updateTask(...).then(() => fetchAndDisplayTasks(uid, testdate))
+  };
+
   return (
     <>
       <NewTask
@@ -97,15 +114,19 @@ export function TaskToScreen() {
       />
       <div id="tasks">
         <ul>
-          {tasks.map(task => (
-            <>
+          {tasks.map((task, idx) => (
+            <React.Fragment key={task.id}>
               <ListItemButton sx={{}}>
                 <ListItemText primary={task.name} />
-
-                {/*key={task.id}>{task.name}*/}
+                <CheckBox
+                  checked={task.done}
+                  onChange={event => handleChecked(event, idx)}
+                  //inputProps={{ 'aria-label': 'controlled' }}
+                />
               </ListItemButton>
+
               <Divider />
-            </>
+            </React.Fragment>
           ))}
         </ul>
       </div>
@@ -118,7 +139,7 @@ export default function NewTask({ onCreate = () => {} }) {
   const [title, setTitle] = useState('');
   const [desc, setDesc] = useState('');
 
-  const [dueDate, setDueDate] = useState(new Date().toISOString().split('T')[0]);
+  const [dueDate, setDueDate] = useState(new Date());
 
   const [anchorEl, setAnchorEl] = React.useState(null);
   const [selectedIndex, setSelectedIndex] = React.useState(1);
@@ -165,7 +186,7 @@ export default function NewTask({ onCreate = () => {} }) {
   const handleSubmit = e => {
     e.preventDefault();
 
-    let sD = dueDate.toISOString().split('T')[0];
+    let sD = dueDate.toISOString().slice(0, 10);
     //let eD = endDate.toString();
     let id = 1;
 
@@ -183,9 +204,11 @@ export default function NewTask({ onCreate = () => {} }) {
     }
     toggleModal();
 
+    const user = auth.currentUser;
+
     const task = {
       id: '',
-      userid: 'xEctZj50XFE34XzJD18LYVtO5hIb',
+      userid: user.uid,
       name: myTask.name,
       description: myTask.desc,
       repeat: false,
@@ -222,7 +245,7 @@ export default function NewTask({ onCreate = () => {} }) {
         <h2>My Task List</h2>
       </div>
 
-      <form class="form" onSubmit={handleSubmit}>
+      <form className="form" onSubmit={handleSubmit}>
         {modal && (
           <div className="modal">
             <div onClick={toggleModal} className="overlay"></div>
@@ -326,9 +349,11 @@ export default function NewTask({ onCreate = () => {} }) {
 // };
 
 function SaveTask({ api }, title, desc, dueDate, selectedIndex) {
+  const user = auth.currentUser;
+  console.log({ user });
   const task = {
     id: '',
-    userid: 'xEctZj50XFE34XzJD18LYVtO5hIb',
+    userid: user.uid,
     name: title,
     description: desc,
     repeat: false,
@@ -336,5 +361,19 @@ function SaveTask({ api }, title, desc, dueDate, selectedIndex) {
     date: dueDate,
   };
 
-  api.addTask('xEctZj50XFE34XzJD18LYVtO5hIb', task);
+  api.addTask(user.uid, task);
 }
+
+// function UpdateTask({ api }, title, desc, dueDate, selectedIndex) {
+//   const task = {
+//     id: '',
+//     userid: 'xEctZj50XFE34XzJD18LYVtO5hIb',
+//     name: title,
+//     description: desc,
+//     repeat: false,
+//     done: false,
+//     date: dueDate,
+//   };
+//
+//   api.editTask('xEctZj50XFE34XzJD18LYVtO5hIb', task);
+// }
