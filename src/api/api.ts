@@ -13,6 +13,7 @@ import {
   remove,
 } from 'firebase/database';
 import { PetType, TaskType } from './models';
+import { omitBy } from 'lodash';
 
 export default class Api {
   private readonly _db?: Database;
@@ -26,6 +27,21 @@ export default class Api {
     { db }: { db?: Database } = { db: undefined }
   ) {
     this._db = db;
+  }
+
+  randomPet(name: string): PetType {
+    const birthday = new Date()
+    return {
+      name,
+      species: 'cat',
+      color: 'red',
+      stage: 'child',
+      health: 100,
+      status: 'happy',
+      birthday: birthday.toISOString(),
+      accessories: [],
+      nextUpdate: new Date(birthday.getTime() + 24*3600*1000).toISOString()
+    };
   }
 
   /**
@@ -46,7 +62,7 @@ export default class Api {
    * @param userid
    * @param pet
    */
-  async createPet(userid: string, pet: PetType): Promise<void> {
+  async createPet(userid: string, pet: { color: string; stage: string; species: string; accessories: any[]; name: string; health: number; status: string }): Promise<void> {
     await set(ref(this.db, `users/${userid}/pet/`), {
       ...pet,
       userid: userid,
@@ -120,10 +136,10 @@ export default class Api {
    * @param userid User who the task belongs to.
    * @param task The updated task.
    */
-  async editTask(userid: string, task: TaskType): Promise<void> {
-    await update(ref(this.db, `users/${userid}/${task.date}/${task.id}/`), {
+  async editTask(userid: string, task: Partial<TaskType> & Pick<TaskType, "id" | "date">): Promise<void> {
+    await update(ref(this.db, `users/${userid}/tasks/${task.date}/${task.id}/`), omitBy({
       ...task,
-    });
+    }, v => v === undefined));
   }
 
   /***

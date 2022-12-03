@@ -5,14 +5,12 @@
         "2022-11-15": {
           "-NGtVoRCyZA8_m2FYju0": {
             "id": "-NGtVoRCyZA8_m2FYju0",
-            "userid": "xEctZj50XFE34XzJD18LYVtO5hIb",
             "name": "Mop floors",
             "description": "Mop kitchen, dining room, and bathrooms.",
             "date": "2022-11-15"
           },
           "-NGtVoRCyZA8_m2FYju1": {
             "id": "-NGtVoRCyZA8_m2FYju1",
-            "userid": "xEctZj50XFE34XzJD18LYVtO5hIb",
             "name": "Wash dishes",
             "description": "Wash dishes in sink & dry them",
             "date": "2022-11-15"
@@ -20,15 +18,15 @@
         }
       },
       "pet": {
-        "userid": "-NGtVoRCyZA8_m2FYju0",
         "name": "Billy",
         "species": "cat",
         "color": "yellow",
         "stage": "child",
-        "age": 1,
+        "birthday": "2022-11-28",
         "health": 50,
         "status": "happy",
-        "accessories": []
+        "accessories": [],
+        "nextUpdate": "2022-11-30"
       }
     }
   }
