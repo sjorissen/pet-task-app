@@ -10,8 +10,10 @@ import {
   startAt,
   endAt,
   query,
+  remove,
 } from 'firebase/database';
 import { PetType, TaskType } from './models';
+import { omitBy } from 'lodash';
 
 export default class Api {
   private readonly _db?: Database;
@@ -27,14 +29,27 @@ export default class Api {
     this._db = db;
   }
 
+  randomPet(name: string): PetType {
+    const birthday = new Date()
+    return {
+      name,
+      species: 'cat',
+      color: 'red',
+      stage: 'child',
+      health: 100,
+      status: 'happy',
+      birthday: birthday.toISOString(),
+      accessories: [],
+      nextUpdate: new Date(birthday.getTime() + 24*3600*1000).toISOString()
+    };
+  }
+
   /**
    * Gets a pet from the database based on ID
    * @param userid
    */
   async getPet(userid: string): Promise<PetType> {
-    this.db;
-    const path = `users/${userid}/pet`;
-    const snap = await get(ref(this.db, path));
+    const snap = await get(ref(this.db, `users/${userid}/pet/`));
     if (snap.exists()) {
       return snap.val() as PetType;
     } else {
@@ -47,8 +62,8 @@ export default class Api {
    * @param userid
    * @param pet
    */
-  async createPet(userid: string, pet: PetType): Promise<void> {
-    await set(ref(this.db, `users/${userid}/pet`), {
+  async createPet(userid: string, pet: { color: string; stage: string; species: string; accessories: any[]; name: string; health: number; status: string }): Promise<void> {
+    await set(ref(this.db, `users/${userid}/pet/`), {
       ...pet,
       userid: userid,
     });
@@ -60,7 +75,7 @@ export default class Api {
    * @param pet
    */
   async updatePet(userid: string, pet: Partial<PetType>): Promise<void> {
-    await update(ref(this.db, 'users/' + userid + '/pet'), {
+    await update(ref(this.db, `users/${userid}/pet/`), {
       ...pet,
     });
   }
@@ -71,7 +86,7 @@ export default class Api {
    * @param task
    */
   async addTask(userid: string, task: Omit<TaskType, "id">) {
-    push(ref(this.db, 'users/' + userid + '/tasks/' + task.date), {
+    push(ref(this.db, `users/${userid}/tasks/${task.date}/`), {
       ...task,
     });
   }
@@ -82,12 +97,13 @@ export default class Api {
    * @param date Date for the task.
    * @param id Task's ID in the database
    */
+  // getTask(userid, task.date, task.id)
   async getTask(userid: string, date: string, id: string): Promise<TaskType> {
-    const path = 'users/' + userid + '/tasks/' + date + '/' + id;
+    const path = `users/${userid}/tasks/${date}/${id}/`;
 
     const snap = await get(ref(this.db, path));
     if (snap.exists()) {
-      return snap.val() as TaskType;
+      return {...snap.val(), id} as TaskType;
     } else {
       throw new Error("couldn't get data");
     }
@@ -105,26 +121,33 @@ export default class Api {
    *    dates between Feb 2, 2022 and Feb 12, 2022.
    */
   async getTasksByDate(userid: string, start: string, end?: string): Promise<TaskType[]> {
-    const path = 'users/' + userid + '/tasks/';
+    const path = `users/${userid}/tasks/`;
     const q = await get(query(ref(this.db, path), orderByKey(), startAt(start),
       endAt(end ? end : start)));
     const snap = q.val();
 
     return Object.keys(snap).reduce((accum, date) => {
-      return accum.concat(Object.keys(snap[date]).map(taskid => snap[date][taskid]))
+      return accum.concat(Object.keys(snap[date]).map(taskid => ({...snap[date][taskid], id: taskid})))
     }, [] as TaskType[])
   }
-
-  // TODO: add getAllTasks()
 
   /***
    * Overwrites the respective task in the database with its new information.
    * @param userid User who the task belongs to.
    * @param task The updated task.
    */
-  async editTask(userid: string, task: TaskType): Promise<void> {
-    await update(ref(this.db, 'users/' + userid + '/tasks/' + task.date + '/' + task.id), {
+  async editTask(userid: string, task: Partial<TaskType> & Pick<TaskType, "id" | "date">): Promise<void> {
+    await update(ref(this.db, `users/${userid}/tasks/${task.date}/${task.id}/`), omitBy({
       ...task,
-    });
+    }, v => v === undefined));
+  }
+
+  /***
+   * Removes a task and its children from the database
+   * @param userid
+   * @param task
+   */
+  async deleteTask(userid: string, task: TaskType): Promise<void> {
+    await remove(ref(this.db, `users/${userid}/tasks/${task.date}/${task.id}/`));
   }
 }
