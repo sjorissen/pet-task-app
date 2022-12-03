@@ -1,7 +1,7 @@
 //import * as fs from 'fs';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
-import { Box, Divider, IconButton, ListItemButton } from '@mui/material';
+import { Box, Divider, IconButton, ListItemButton, Typography } from '@mui/material';
 import Button from '@mui/material/Button';
 import CheckBox from '@mui/material/Checkbox';
 import List from '@mui/material/List';
@@ -116,15 +116,21 @@ export function TaskToScreen() {
       <div id="tasks">
         <ul>
           {tasks.map((task, idx) => (
-            <Tooltip title="Hello" key={task.id}>
-              <React.Fragment key={task.id}>
-                <ListItemButton sx={{}} onClick={() => handleChecked(idx)}>
-                  <ListItemText primary={task.name} />
-                  <CheckBox checked={task.done} />
-                </ListItemButton>
+            <Tooltip
+              title={<Typography fontSize={20}>Description: {task.description}</Typography>}
+              key={task.id}
+              arrow
+              sx={{ width: 100 }}>
+              <div>
+                <React.Fragment key={task.id}>
+                  <ListItemButton sx={{}} onClick={() => handleChecked(idx)}>
+                    <ListItemText primary={task.name} />
+                    <CheckBox checked={task.done} />
+                  </ListItemButton>
 
-                <Divider />
-              </React.Fragment>
+                  <Divider />
+                </React.Fragment>
+              </div>
             </Tooltip>
           ))}
         </ul>

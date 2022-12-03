@@ -10,7 +10,7 @@ import { getAuth } from 'firebase/auth';
 import moment from 'moment';
 import React, { useEffect, useState } from 'react';
 import Api from '../api/api';
-import database from '../api/firebase-config';
+import database, { auth } from '../api/firebase-config';
 
 /* let testTitle = testTask.name;
 
