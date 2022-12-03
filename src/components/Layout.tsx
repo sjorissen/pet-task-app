@@ -4,9 +4,9 @@ import React, { ReactElement, ReactNode, useEffect, useState } from 'react';
 import Api from '../api/api';
 import db, { auth } from '../api/firebase-config';
 import { PetType } from '../api/models';
+import { logo } from '../logo/logoMan.png';
 import styles from './Layout.module.scss';
 import { LoginForm, CreatePetForm } from './UserAuth';
-
 type PetCtx = [PetType | undefined, (p: PetType) => void];
 const PetContext = React.createContext([undefined, () => {}] as PetCtx);
 export const usePet = () => React.useContext(PetContext);
@@ -47,8 +47,9 @@ export default function Layout({ children }: { children: ReactNode }): ReactElem
       <Box className={styles.app}>
         <AppBar position="static" className={styles.navbar}>
           <Toolbar>
+            {/*<img src={logo} alt="Furryminder Mascot" id="logoMan"></img>*/}
             <Typography id="furryMinder" variant="h6" component="div">
-              Furry-Minder
+              <h2>Furry-Minder</h2>
             </Typography>
             {userId ? (
               <Button color="inherit" onClick={() => signOut(auth)}>

@@ -1,17 +1,19 @@
 
 .header{
-    background-color: #1833EB;
+    background-color: #1c74d4;
     /*padding: 30px 40px;*/
     display: inline-block;
     width: 100%;
-    line-height: 150px;
-    height: 150px;
+    line-height: 100px;
+    height: 100px;
     color: white;
     text-align: center;
     vertical-align: middle;
     font-family: "Courier New";
-}
+    border: solid 5px #175BA6;
+    border-radius: 10px 10px 0px 0px;
 
+}
 body.active-modal{
     overflow-y:hidden;
 }
@@ -115,3 +117,11 @@ body.active-modal{
     right: 20px;
 }
 
+#tasks{
+    border-right: solid 5px #175BA6;
+    border-left: solid 5px #175BA6;
+    border-bottom: solid 5px #175BA6;
+    border-radius: 0px 0px 3px 3px;
+    background-color: white;
+    height: 400px;
+}
