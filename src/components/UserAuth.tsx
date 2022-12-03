@@ -13,7 +13,7 @@ import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'fire
 import { FormEvent, useState } from 'react';
 import Api from '../api/api';
 import db, { auth } from '../api/firebase-config';
-import { PetType } from '../api/models';
+import { PetColor, PetStage, PetStatus, Species } from '../api/models';
 import styles from './UserAuth.module.scss';
 
 // Takes form entries and serializes to an object. { key: "value" }
@@ -133,7 +133,17 @@ export function CreatePetForm({
   setPet,
 }: {
   userid: string;
-  setPet: (p: PetType) => void;
+  setPet: (p: {
+    color: PetColor;
+    stage: PetStage;
+    species: Species;
+    accessories: any[];
+    name: string;
+    health: number;
+    status: PetStatus;
+    birthday: string;
+    nextUpdate: string;
+  }) => void;
 }) {
   const [error, setError] = useState('');
 
@@ -144,17 +154,7 @@ export function CreatePetForm({
     event.preventDefault();
     setError('');
     const { petName } = serializeForm(event.currentTarget);
-    const pet: PetType = {
-      id: '', // TODO: fill this in with actual id from firebase record
-      userid,
-      name: petName,
-      species: 'cat',
-      color: 'red',
-      stage: 'child',
-      health: 100,
-      status: 'happy',
-      accessories: [],
-    };
+    const pet = api.randomPet(petName);
     api
       .createPet(userid, pet)
       .then(() => setPet(pet))
