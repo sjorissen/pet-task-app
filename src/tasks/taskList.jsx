@@ -101,6 +101,7 @@ export function TaskToScreen() {
 
   const handleChecked = idx => {
     tasks[idx].done = !tasks[idx].done;
+
     setTasks([...tasks]);
     const { id, date, done } = tasks[idx];
     api.editTask(user.uid, { id, date, done }).then(console.log).catch(console.error);
@@ -124,7 +125,17 @@ export function TaskToScreen() {
               <div>
                 <React.Fragment key={task.id}>
                   <ListItemButton sx={{}} onClick={() => handleChecked(idx)}>
-                    <ListItemText primary={task.name} />
+                    <ListItemText
+                      primary={
+                        task.done ? (
+                          <Typography sx={{ textDecoration: 'line-through' }}>
+                            {tasks[idx].name}
+                          </Typography>
+                        ) : (
+                          <Typography>{tasks[idx].name}</Typography>
+                        )
+                      }
+                    />
                     <CheckBox checked={task.done} />
                   </ListItemButton>
 
