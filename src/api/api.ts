@@ -126,9 +126,13 @@ export default class Api {
       endAt(end ? end : start)));
     const snap = q.val();
 
-    return Object.keys(snap).reduce((accum, date) => {
-      return accum.concat(Object.keys(snap[date]).map(taskid => ({...snap[date][taskid], id: taskid})))
-    }, [] as TaskType[])
+    if (snap) {
+      return Object.keys(snap).reduce((accum, date) => {
+        return accum.concat(Object.keys(snap[date]).map(taskid => ({ ...snap[date][taskid], id: taskid })))
+      }, [] as TaskType[])
+    } else {
+      return [];
+    }
   }
 
   /***
@@ -141,7 +145,7 @@ export default class Api {
       ...task,
     }, v => v === undefined));
   }
-
+  
   /***
    * Removes a task and its children from the database
    * @param userid
