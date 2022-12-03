@@ -1,6 +1,8 @@
 //import * as fs from 'fs';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
+import DeleteIcon from '@mui/icons-material/Delete';
+import EditIcon from '@mui/icons-material/Edit';
 import { Box, Divider, IconButton, ListItemButton, Typography } from '@mui/material';
 import Button from '@mui/material/Button';
 import CheckBox from '@mui/material/Checkbox';
@@ -74,12 +76,9 @@ export function TaskToScreen() {
 
   let today = new Date();
   let start = today.toISOString().slice(0, 10);
-  console.log(start);
   const testdate = start;
 
   const api = new Api({ db: database });
-
-  console.log({ user });
 
   const fetchAndDisplayTasks = (userid, date) => {
     api
@@ -87,8 +86,7 @@ export function TaskToScreen() {
       .then(function (_tasks) {
         setTasks(_tasks);
       })
-
-      .catch(console.warn);
+      .catch(console.error);
   };
 
   useEffect(() => {
@@ -97,13 +95,20 @@ export function TaskToScreen() {
 
   window.api = api;
 
-  console.log(tasks);
-
   const handleChecked = idx => {
     tasks[idx].done = !tasks[idx].done;
     setTasks([...tasks]);
     const { id, date, done } = tasks[idx];
     api.editTask(user.uid, { id, date, done }).then(console.log).catch(console.error);
+  };
+
+  const handleDelete = idx => {
+    api.deleteTask(user.uid, tasks[idx]);
+    tasks.splice(idx, 1);
+    setTasks([...tasks]);
+    alert('see? We deleted things');
+    const { id, date, done } = tasks[idx];
+    console.log('🤫');
   };
 
   return (
@@ -123,9 +128,18 @@ export function TaskToScreen() {
               sx={{ width: 100 }}>
               <div>
                 <React.Fragment key={task.id}>
-                  <ListItemButton sx={{}} onClick={() => handleChecked(idx)}>
+                  <ListItemButton sx={{}}>
+                    <CheckBox checked={task.done} onClick={() => handleChecked(idx)} />
                     <ListItemText primary={task.name} />
-                    <CheckBox checked={task.done} />
+                    <IconButton variant="secondary" className="Edit-Btn">
+                      <EditIcon />
+                    </IconButton>
+                    <IconButton
+                      variant="secondary"
+                      className="Delete-Btn"
+                      onClick={() => handleDelete(idx)}>
+                      <DeleteIcon />
+                    </IconButton>
                   </ListItemButton>
 
                   <Divider />
