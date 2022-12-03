@@ -1,7 +1,7 @@
 //import * as fs from 'fs';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
-import { Box, Divider, IconButton, ListItemButton } from '@mui/material';
+import { Box, Divider, IconButton, ListItemButton, Tooltip } from '@mui/material';
 import Button from '@mui/material/Button';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
@@ -22,8 +22,6 @@ import database, { auth } from '../api/firebase-config';
 import EventCalendar from '../calendar/EventCalendar';
 import './taskList.css';
 // eslint-disable-next-line import/order
-import { CheckBox } from '@mui/icons-material';
-
 //import Modal from '@mui/material/Modal';
 //import Button from '@mui/material/Button';
 
@@ -99,10 +97,11 @@ export function TaskToScreen() {
 
   console.log(tasks);
 
-  const handleChecked = (event, idx) => {
-    tasks[idx].done = !event.target.checked;
-    setTasks(tasks);
-    //api.updateTask(...).then(() => fetchAndDisplayTasks(uid, testdate))
+  const handleChecked = idx => {
+    tasks[idx].done = !tasks[idx].done;
+    setTasks([...tasks]);
+    const { id, date, done } = tasks[idx];
+    api.editTask(user.uid, { id, date, done }).then(console.log).catch(console.error);
   };
 
   return (
@@ -115,18 +114,16 @@ export function TaskToScreen() {
       <div id="tasks">
         <ul>
           {tasks.map((task, idx) => (
-            <React.Fragment key={task.id}>
-              <ListItemButton sx={{}}>
-                <ListItemText primary={task.name} />
-                <CheckBox
-                  checked={task.done}
-                  onChange={event => handleChecked(event, idx)}
-                  //inputProps={{ 'aria-label': 'controlled' }}
-                />
-              </ListItemButton>
+            <Tooltip key={task.id} title="hello">
+              <React.Fragment key={task.id}>
+                <ListItemButton sx={{}} onClick={() => handleChecked(idx)}>
+                  <ListItemText primary={task.name} />
+                  <CheckBox checked={task.done} />
+                </ListItemButton>
 
-              <Divider />
-            </React.Fragment>
+                <Divider />
+              </React.Fragment>
+            </Tooltip>
           ))}
         </ul>
       </div>
