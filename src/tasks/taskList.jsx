@@ -11,7 +11,6 @@ import ListItem from '@mui/material/ListItem';
 import ListItemText from '@mui/material/ListItemText';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
-import Modal from '@mui/material/Modal';
 import TextField from '@mui/material/TextField';
 import Tooltip from '@mui/material/Tooltip';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
@@ -26,6 +25,7 @@ import database, { auth } from '../api/firebase-config';
 import EventCalendar from '../calendar/EventCalendar';
 import './taskList.css';
 import formStyles from '../components/Forms.module.scss';
+import Modal from '../components/Modal';
 import styles from '../pet/petView.module.scss';
 // eslint-disable-next-line import/order
 //import Modal from '@mui/material/Modal';
@@ -130,6 +130,7 @@ export function TaskToScreen() {
     api.editTask(user.uid, editedTask).then(() => {
       if (editedTask.date !== originalTask.date) api.deleteTask(user.uid, originalTask);
     });
+    handleCloseEdit();
   };
   // eslint-disable-next-line no-restricted-globals
 
@@ -143,52 +144,48 @@ export function TaskToScreen() {
       <div id="tasks">
         <ul>
           {tasks.map((task, idx) => (
-            <Tooltip
-              title={
-                <Typography fontSize={20}>
-                  Description: {task.description} Date: {task.date}
-                </Typography>
-              }
-              key={task.id}
-              arrow
-              sx={{ width: 100 }}>
-              <div>
-                <React.Fragment key={task.id}>
-                  <ListItemButton sx={{}}>
-                    <CheckBox checked={task.done} onClick={() => handleChecked(idx)} />
-                    {/*<ListItemText primary={task.name} />*/}
-                    <ListItemText
-                      primary={
-                        task.done ? (
-                          <Typography sx={{ textDecoration: 'line-through' }}>
-                            {tasks[idx].name}
-                          </Typography>
-                        ) : (
-                          <Typography>{tasks[idx].name}</Typography>
-                        )
-                      }
-                    />
-                    <IconButton variant="secondary" className="Edit-Btn" onClick={handleOpen}>
-                      <EditIcon />
-                      <Modal open={openEdit} onClose={handleCloseEdit}>
-                        <EditTask
-                          task={task}
-                          taskUpdate={editedTask => updateTask(idx, editedTask)}
-                        />
-                      </Modal>
-                    </IconButton>
-                    <IconButton
-                      variant="secondary"
-                      className="Delete-Btn"
-                      onClick={() => handleDelete(idx)}>
-                      <DeleteIcon />
-                    </IconButton>
-                  </ListItemButton>
-
-                  <Divider />
-                </React.Fragment>
-              </div>
-            </Tooltip>
+            <div key={task.id}>
+              <Tooltip
+                title={
+                  <Typography fontSize={20}>
+                    Description: {task.description} Date: {task.date}
+                  </Typography>
+                }
+                arrow
+                sx={{ width: 100 }}>
+                <ListItemButton sx={{}}>
+                  <CheckBox checked={task.done} onClick={() => handleChecked(idx)} />
+                  {/*<ListItemText primary={task.name} />*/}
+                  <ListItemText
+                    primary={
+                      task.done ? (
+                        <Typography sx={{ textDecoration: 'line-through' }}>
+                          {tasks[idx].name}
+                        </Typography>
+                      ) : (
+                        <Typography>{tasks[idx].name}</Typography>
+                      )
+                    }
+                  />
+                  <IconButton variant="secondary" className="Edit-Btn" onClick={handleOpen}>
+                    <EditIcon />
+                  </IconButton>
+                  <IconButton
+                    variant="secondary"
+                    className="Delete-Btn"
+                    onClick={() => handleDelete(idx)}>
+                    <DeleteIcon />
+                  </IconButton>
+                </ListItemButton>
+              </Tooltip>
+              <Divider />
+              <Modal open={openEdit} onClose={handleCloseEdit}>
+                <div style={{ width: '500px' }}>
+                  <EditTask task={task} taskUpdate={editedTask => updateTask(idx, editedTask)} />
+                </div>
+                {/*<Button className="close-modal" onClick={handleCloseEdit}></Button>*/}
+              </Modal>
+            </div>
           ))}
         </ul>
       </div>
@@ -311,18 +308,20 @@ export default function NewTask({ onCreate = () => {} }) {
 
       <form className="form" onSubmit={handleSubmit}>
         {modal && (
-          <div className="modal">
-            <div onClick={toggleModal} className="overlay"></div>
+          <div className="modal-content">
+            <div onClick={toggleModal} className="modal-content"></div>
 
-            <div className="modal-content">
-              <h2> New Task</h2>
+            <div className={formStyles.form}>
+              <Typography variant="h3" className={formStyles.heading}>
+                New Task
+              </Typography>
               <div>
                 <TextField
                   required
                   onChange={e => setTitle(e.target.value)}
                   id="taskName"
                   label="Task Name:"
-                  variant="standard"
+                  variant="outlined"
                 />
               </div>
 
@@ -332,7 +331,7 @@ export default function NewTask({ onCreate = () => {} }) {
                   id="description"
                   onChange={e => setDesc(e.target.value)}
                   label="Description:"
-                  variant="standard"
+                  variant="outlined"
                 />
               </div>
 
@@ -384,15 +383,11 @@ export default function NewTask({ onCreate = () => {} }) {
                 ))}
               </Menu>
 
+              <Button variant="contained" type="submit">
+                Submit
+              </Button>
               <button className="close-modal" onClick={toggleModal}>
                 Close
-              </button>
-
-              <button
-                className="save-modal"
-                //onClick={}
-              >
-                Save
               </button>
             </div>
           </div>
@@ -436,6 +431,7 @@ function EditTask({ task, taskUpdate }) {
           type="text"
           size="small"
           required
+          width={100}
         />
         <TextField
           defaultValue={task.description}
@@ -446,7 +442,6 @@ function EditTask({ task, taskUpdate }) {
           size="small"
         />
         {/*<input name="date" hidden value={dueDate} />*/}
-
         <LocalizationProvider dateAdapter={AdapterDayjs}>
           <DatePicker
             required
