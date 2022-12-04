@@ -1,7 +1,9 @@
 //import * as fs from 'fs';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
-import { Box, Divider, IconButton, ListItemButton, Typography } from '@mui/material';
+import DeleteIcon from '@mui/icons-material/Delete';
+import EditIcon from '@mui/icons-material/Edit';
+import { Alert, Box, Divider, IconButton, ListItemButton, Typography } from '@mui/material';
 import Button from '@mui/material/Button';
 import CheckBox from '@mui/material/Checkbox';
 import List from '@mui/material/List';
@@ -9,13 +11,11 @@ import ListItem from '@mui/material/ListItem';
 import ListItemText from '@mui/material/ListItemText';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
-import Modal from '@mui/material/Modal';
 import TextField from '@mui/material/TextField';
 import Tooltip from '@mui/material/Tooltip';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { getAuth } from 'firebase/auth';
 import React, { useEffect, useRef, useState } from 'react';
 import Api from '../api/api';
 //import { getTask } from '../api/mocks';
@@ -23,6 +23,9 @@ import Api from '../api/api';
 import database, { auth } from '../api/firebase-config';
 import EventCalendar from '../calendar/EventCalendar';
 import './taskList.css';
+import formStyles from '../components/Forms.module.scss';
+import Modal from '../components/Modal';
+import styles from '../pet/petView.module.scss';
 // eslint-disable-next-line import/order
 //import Modal from '@mui/material/Modal';
 //import Button from '@mui/material/Button';
@@ -58,6 +61,13 @@ function getTaskList() {
 
  */
 
+const dateInTZ = (date = new Date()) => {
+  if (typeof date === 'string') date = new Date(date);
+  else if (!(date instanceof Date)) date = date.toDate();
+  const zeroPadded = number => String(number).padStart(2, '0');
+  return `${date.getFullYear()}-${zeroPadded(date.getMonth() + 1)}-${zeroPadded(date.getDate())}`;
+};
+
 export function TaskToScreen() {
   // const [task, setTask] = useState({
   //   name: '',
@@ -73,13 +83,10 @@ export function TaskToScreen() {
   const taskid = '-NGtVoRCyZA8_m2FYju0';
 
   let today = new Date();
-  let start = today.toISOString().slice(0, 10);
-  console.log(start);
+  let start = dateInTZ();
   const testdate = start;
 
   const api = new Api({ db: database });
-
-  console.log({ user });
 
   const fetchAndDisplayTasks = (userid, date) => {
     api
@@ -87,8 +94,7 @@ export function TaskToScreen() {
       .then(function (_tasks) {
         setTasks(_tasks);
       })
-
-      .catch(console.warn);
+      .catch(console.error);
   };
 
   useEffect(() => {
@@ -97,15 +103,34 @@ export function TaskToScreen() {
 
   window.api = api;
 
-  console.log(tasks);
-
   const handleChecked = idx => {
     tasks[idx].done = !tasks[idx].done;
-
     setTasks([...tasks]);
     const { id, date, done } = tasks[idx];
     api.editTask(user.uid, { id, date, done }).then(console.log).catch(console.error);
   };
+
+  const handleDelete = idx => {
+    api.deleteTask(user.uid, tasks[idx]);
+    tasks.splice(idx, 1);
+    setTasks([...tasks]);
+    // console.log('🤫');
+  };
+
+  const [openEdit, setEdit] = useState(false);
+  const handleOpen = () => setEdit(true);
+  const handleCloseEdit = () => setEdit(false);
+
+  const updateTask = (idx, editedTask) => {
+    const originalTask = tasks[idx];
+    tasks[idx] = editedTask;
+    setTasks([...tasks]);
+    api.editTask(user.uid, editedTask).then(() => {
+      if (editedTask.date !== originalTask.date) api.deleteTask(user.uid, originalTask);
+    });
+    handleCloseEdit();
+  };
+  // eslint-disable-next-line no-restricted-globals
 
   return (
     <>
@@ -117,32 +142,48 @@ export function TaskToScreen() {
       <div id="tasks">
         <ul>
           {tasks.map((task, idx) => (
-            <Tooltip
-              title={<Typography fontSize={20}>Description: {task.description}</Typography>}
-              key={task.id}
-              arrow
-              sx={{ width: 100 }}>
-              <div>
-                <React.Fragment key={task.id}>
-                  <ListItemButton sx={{}} onClick={() => handleChecked(idx)}>
-                    <ListItemText
-                      primary={
-                        task.done ? (
-                          <Typography sx={{ textDecoration: 'line-through' }}>
-                            {tasks[idx].name}
-                          </Typography>
-                        ) : (
-                          <Typography>{tasks[idx].name}</Typography>
-                        )
-                      }
-                    />
-                    <CheckBox checked={task.done} />
-                  </ListItemButton>
-
-                  <Divider />
-                </React.Fragment>
-              </div>
-            </Tooltip>
+            <div key={task.id}>
+              <Tooltip
+                title={
+                  <Typography fontSize={20}>
+                    Description: {task.description} Date: {task.date}
+                  </Typography>
+                }
+                arrow
+                sx={{ width: 100 }}>
+                <ListItemButton sx={{}}>
+                  <CheckBox checked={task.done} onClick={() => handleChecked(idx)} />
+                  {/*<ListItemText primary={task.name} />*/}
+                  <ListItemText
+                    primary={
+                      task.done ? (
+                        <Typography sx={{ textDecoration: 'line-through' }}>
+                          {tasks[idx].name}
+                        </Typography>
+                      ) : (
+                        <Typography>{tasks[idx].name}</Typography>
+                      )
+                    }
+                  />
+                  <IconButton variant="secondary" className="Edit-Btn" onClick={handleOpen}>
+                    <EditIcon />
+                  </IconButton>
+                  <IconButton
+                    variant="secondary"
+                    className="Delete-Btn"
+                    onClick={() => handleDelete(idx)}>
+                    <DeleteIcon />
+                  </IconButton>
+                </ListItemButton>
+              </Tooltip>
+              <Divider />
+              <Modal open={openEdit} onClose={handleCloseEdit}>
+                <div style={{ width: '500px' }}>
+                  <EditTask task={task} taskUpdate={editedTask => updateTask(idx, editedTask)} />
+                </div>
+                {/*<Button className="close-modal" onClick={handleCloseEdit}></Button>*/}
+              </Modal>
+            </div>
           ))}
         </ul>
       </div>
@@ -202,7 +243,9 @@ export default function NewTask({ onCreate = () => {} }) {
   const handleSubmit = e => {
     e.preventDefault();
 
-    let sD = dueDate.toISOString().slice(0, 10);
+    let sD = dateInTZ();
+    console.log(dueDate, sD);
+
     //let eD = endDate.toString();
     let id = 1;
 
@@ -263,18 +306,20 @@ export default function NewTask({ onCreate = () => {} }) {
 
       <form className="form" onSubmit={handleSubmit}>
         {modal && (
-          <div className="modal">
-            <div onClick={toggleModal} className="overlay"></div>
+          <div className="modal-content">
+            <div onClick={toggleModal} className="modal-content"></div>
 
-            <div className="modal-content">
-              <h2> New Task</h2>
+            <div className={formStyles.form}>
+              <Typography variant="h3" className={formStyles.heading}>
+                New Task
+              </Typography>
               <div>
                 <TextField
                   required
                   onChange={e => setTitle(e.target.value)}
                   id="taskName"
                   label="Task Name:"
-                  variant="standard"
+                  variant="outlined"
                 />
               </div>
 
@@ -284,7 +329,7 @@ export default function NewTask({ onCreate = () => {} }) {
                   id="description"
                   onChange={e => setDesc(e.target.value)}
                   label="Description:"
-                  variant="standard"
+                  variant="outlined"
                 />
               </div>
 
@@ -336,15 +381,11 @@ export default function NewTask({ onCreate = () => {} }) {
                 ))}
               </Menu>
 
+              <Button variant="contained" type="submit">
+                Submit
+              </Button>
               <button className="close-modal" onClick={toggleModal}>
                 Close
-              </button>
-
-              <button
-                className="save-modal"
-                //onClick={}
-              >
-                Save
               </button>
             </div>
           </div>
@@ -354,19 +395,70 @@ export default function NewTask({ onCreate = () => {} }) {
   );
 }
 
-// export type TaskType = {
-//   id: number;
-//   userid: number;
-//   name: string;
-//   description: string;
-//   repeat: boolean;
-//   done: boolean;
-//   date: string;
-// };
+function EditTask({ task, taskUpdate }) {
+  const [error, setError] = useState(null);
+  const [dueDate, setDueDate] = useState(task.date);
+
+  const onSubmit = event => {
+    event.preventDefault();
+    setError(null);
+    const editedTask = {
+      ...task,
+      ...Object.fromEntries(new FormData(event.target)),
+      date: dateInTZ(dueDate),
+    };
+    taskUpdate(editedTask);
+  };
+
+  return (
+    <Box>
+      <form onSubmit={onSubmit} className={formStyles.form}>
+        {error && <Alert severity="error">Something bad: {error}</Alert>}
+        <Typography variant="h3" className={formStyles.heading}>
+          Edit Task
+        </Typography>
+        <TextField
+          defaultValue={task.name}
+          variant="outlined"
+          label="Task Name"
+          name="name"
+          type="text"
+          size="small"
+          required
+          width={100}
+        />
+        <TextField
+          defaultValue={task.description}
+          variant="outlined"
+          label="Task Description"
+          name="description"
+          type="text"
+          size="small"
+        />
+        {/*<input name="date" hidden value={dueDate} />*/}
+        <LocalizationProvider dateAdapter={AdapterDayjs}>
+          <DatePicker
+            required
+            id="due"
+            label="Due Date"
+            dateFormat="MM/dd/yyyy"
+            value={dueDate}
+            onChange={date => {
+              setDueDate(date);
+            }}
+            renderInput={params => <TextField {...params} />}
+          />
+        </LocalizationProvider>
+        <Button variant="contained" type="submit">
+          Submit
+        </Button>
+      </form>
+    </Box>
+  );
+}
 
 function SaveTask({ api }, title, desc, dueDate, selectedIndex) {
   const user = auth.currentUser;
-  console.log({ user });
   const task = {
     id: '',
     userid: user.uid,

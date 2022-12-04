@@ -73,6 +73,7 @@ body.active-modal{
     position: fixed;
 }
 
+
 .edit-modal-content{
     position: absolute;
     top: 40%;
