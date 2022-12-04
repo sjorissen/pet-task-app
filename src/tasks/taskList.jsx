@@ -3,7 +3,7 @@ import AddCircleIcon from '@mui/icons-material/AddCircle';
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
-import { Box, Divider, IconButton, ListItemButton, Typography } from '@mui/material';
+import { Alert, Box, Divider, IconButton, ListItemButton, Typography } from '@mui/material';
 import Button from '@mui/material/Button';
 import CheckBox from '@mui/material/Checkbox';
 import List from '@mui/material/List';
@@ -25,6 +25,8 @@ import Api from '../api/api';
 import database, { auth } from '../api/firebase-config';
 import EventCalendar from '../calendar/EventCalendar';
 import './taskList.css';
+import formStyles from '../components/Forms.module.scss';
+import styles from '../pet/petView.module.scss';
 // eslint-disable-next-line import/order
 //import Modal from '@mui/material/Modal';
 //import Button from '@mui/material/Button';
@@ -59,6 +61,12 @@ function getTaskList() {
 }
 
  */
+
+const dateInTZ = () => {
+  const zeroPadded = number => String(number).padStart(2, '0');
+  const now = new Date();
+  return `${now.getFullYear()}-${zeroPadded(now.getMonth() + 1)}-${zeroPadded(now.getDate())}`;
+};
 
 export function TaskToScreen() {
   // const [task, setTask] = useState({
@@ -106,10 +114,24 @@ export function TaskToScreen() {
     api.deleteTask(user.uid, tasks[idx]);
     tasks.splice(idx, 1);
     setTasks([...tasks]);
-    alert('see? We deleted things');
+    // alert('see? We deleted things');
     const { id, date, done } = tasks[idx];
-    console.log('🤫');
+    // console.log('🤫');
   };
+
+  const [openEdit, setEdit] = useState(false);
+  const handleOpen = () => setEdit(true);
+  const handleCloseEdit = () => setEdit(prevState => !prevState);
+
+  const updateTask = (idx, editedTask) => {
+    const originalTask = tasks[idx];
+    tasks[idx] = editedTask;
+    setTasks([...tasks]);
+    api.editTask(user.uid, editedTask).then(() => {
+      if (editedTask.date !== originalTask.date) api.deleteTask(user.uid, originalTask);
+    });
+  };
+  // eslint-disable-next-line no-restricted-globals
 
   return (
     <>
@@ -122,7 +144,11 @@ export function TaskToScreen() {
         <ul>
           {tasks.map((task, idx) => (
             <Tooltip
-              title={<Typography fontSize={20}>Description: {task.description}</Typography>}
+              title={
+                <Typography fontSize={20}>
+                  Description: {task.description} Date: {task.date}
+                </Typography>
+              }
               key={task.id}
               arrow
               sx={{ width: 100 }}>
@@ -131,8 +157,14 @@ export function TaskToScreen() {
                   <ListItemButton sx={{}}>
                     <CheckBox checked={task.done} onClick={() => handleChecked(idx)} />
                     <ListItemText primary={task.name} />
-                    <IconButton variant="secondary" className="Edit-Btn">
+                    <IconButton variant="secondary" className="Edit-Btn" onClick={handleOpen}>
                       <EditIcon />
+                      <Modal open={openEdit} onClose={handleCloseEdit}>
+                        <EditTask
+                          task={task}
+                          taskUpdate={editedTask => updateTask(idx, editedTask)}
+                        />
+                      </Modal>
                     </IconButton>
                     <IconButton
                       variant="secondary"
@@ -205,7 +237,9 @@ export default function NewTask({ onCreate = () => {} }) {
   const handleSubmit = e => {
     e.preventDefault();
 
-    let sD = dueDate.toISOString().slice(0, 10);
+    let sD = dateInTZ();
+    console.log(dueDate, sD);
+
     //let eD = endDate.toString();
     let id = 1;
 
@@ -357,15 +391,71 @@ export default function NewTask({ onCreate = () => {} }) {
   );
 }
 
-// export type TaskType = {
-//   id: number;
-//   userid: number;
-//   name: string;
-//   description: string;
-//   repeat: boolean;
-//   done: boolean;
-//   date: string;
-// };
+function EditTask({ task, taskUpdate }) {
+  const [error, setError] = useState(null);
+  const [dueDate, setDueDate] = useState(task.date);
+
+  console.debug({ dueDate });
+
+  const onSubmit = event => {
+    event.preventDefault();
+    setError(null);
+    const editedTask = {
+      ...task,
+      ...Object.fromEntries(new FormData(event.target)),
+      date: dueDate.toISOString().slice(0, 10),
+    };
+
+    console.debug({ editedTask });
+    taskUpdate(editedTask);
+  };
+
+  return (
+    <Box className="edit-modal-content">
+      <form onSubmit={onSubmit} className={formStyles.form}>
+        {error && <Alert severity="error">Something bad: {error}</Alert>}
+        <Typography variant="h3" className={formStyles.heading}>
+          Edit Task
+        </Typography>
+        <TextField
+          defaultValue={task.name}
+          variant="outlined"
+          label="Task Name"
+          name="name"
+          type="text"
+          size="small"
+          required
+        />
+        <TextField
+          defaultValue={task.description}
+          variant="outlined"
+          label="Task Description"
+          name="description"
+          type="text"
+          size="small"
+        />
+        {/*<input name="date" hidden value={dueDate} />*/}
+
+        <LocalizationProvider dateAdapter={AdapterDayjs}>
+          <DatePicker
+            required
+            id="due"
+            label="Due Date"
+            dateFormat="MM/dd/yyyy"
+            value={dueDate}
+            onChange={date => {
+              setDueDate(date);
+            }}
+            renderInput={params => <TextField {...params} />}
+          />
+        </LocalizationProvider>
+        <Button variant="contained" type="submit">
+          Submit
+        </Button>
+      </form>
+    </Box>
+  );
+}
 
 function SaveTask({ api }, title, desc, dueDate, selectedIndex) {
   const user = auth.currentUser;
