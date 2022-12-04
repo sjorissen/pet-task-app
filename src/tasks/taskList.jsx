@@ -16,7 +16,6 @@ import Tooltip from '@mui/material/Tooltip';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { getAuth } from 'firebase/auth';
 import React, { useEffect, useRef, useState } from 'react';
 import Api from '../api/api';
 //import { getTask } from '../api/mocks';
@@ -62,10 +61,11 @@ function getTaskList() {
 
  */
 
-const dateInTZ = () => {
+const dateInTZ = (date = new Date()) => {
+  if (typeof date === 'string') date = new Date(date);
+  else if (!(date instanceof Date)) date = date.toDate();
   const zeroPadded = number => String(number).padStart(2, '0');
-  const now = new Date();
-  return `${now.getFullYear()}-${zeroPadded(now.getMonth() + 1)}-${zeroPadded(now.getDate())}`;
+  return `${date.getFullYear()}-${zeroPadded(date.getMonth() + 1)}-${zeroPadded(date.getDate())}`;
 };
 
 export function TaskToScreen() {
@@ -83,7 +83,7 @@ export function TaskToScreen() {
   const taskid = '-NGtVoRCyZA8_m2FYju0';
 
   let today = new Date();
-  let start = today.toISOString().slice(0, 10);
+  let start = dateInTZ();
   const testdate = start;
 
   const api = new Api({ db: database });
@@ -114,14 +114,12 @@ export function TaskToScreen() {
     api.deleteTask(user.uid, tasks[idx]);
     tasks.splice(idx, 1);
     setTasks([...tasks]);
-    // alert('see? We deleted things');
-    const { id, date, done } = tasks[idx];
     // console.log('🤫');
   };
 
   const [openEdit, setEdit] = useState(false);
   const handleOpen = () => setEdit(true);
-  const handleCloseEdit = () => setEdit(prevState => !prevState);
+  const handleCloseEdit = () => setEdit(false);
 
   const updateTask = (idx, editedTask) => {
     const originalTask = tasks[idx];
@@ -401,23 +399,19 @@ function EditTask({ task, taskUpdate }) {
   const [error, setError] = useState(null);
   const [dueDate, setDueDate] = useState(task.date);
 
-  console.debug({ dueDate });
-
   const onSubmit = event => {
     event.preventDefault();
     setError(null);
     const editedTask = {
       ...task,
       ...Object.fromEntries(new FormData(event.target)),
-      date: dueDate.toISOString().slice(0, 10),
+      date: dateInTZ(dueDate),
     };
-
-    console.debug({ editedTask });
     taskUpdate(editedTask);
   };
 
   return (
-    <Box className="edit-modal-content">
+    <Box>
       <form onSubmit={onSubmit} className={formStyles.form}>
         {error && <Alert severity="error">Something bad: {error}</Alert>}
         <Typography variant="h3" className={formStyles.heading}>
@@ -465,7 +459,6 @@ function EditTask({ task, taskUpdate }) {
 
 function SaveTask({ api }, title, desc, dueDate, selectedIndex) {
   const user = auth.currentUser;
-  console.log({ user });
   const task = {
     id: '',
     userid: user.uid,
