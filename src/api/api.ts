@@ -36,7 +36,7 @@ export default class Api {
       species: 'cat',
       color: 'red',
       stage: 'child',
-      health: 100,
+      health: 50,
       status: 'happy',
       birthday: birthday.toISOString(),
       accessories: [],
@@ -78,6 +78,10 @@ export default class Api {
     await update(ref(this.db, `users/${userid}/pet/`), {
       ...pet,
     });
+  }
+
+  async deletePet(userid: string, pet: PetType): Promise<void> {
+    await remove(ref(this.db, `users/${userid}/pet/`));
   }
 
   /**
@@ -145,7 +149,7 @@ export default class Api {
       ...task,
     }, v => v === undefined));
   }
-  
+
   /***
    * Removes a task and its children from the database
    * @param userid

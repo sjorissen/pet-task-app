@@ -4,9 +4,11 @@ import Button from '@mui/material/Button';
 import clsx from 'clsx';
 import { useEffect, useState } from 'react';
 import Api from '../api/api';
-import database from '../api/firebase-config';
+import database, { auth } from '../api/firebase-config';
 import formStyles from '../components/Forms.module.scss';
+import { usePet } from '../components/Layout';
 import Modal from '../components/Modal';
+import { isUpdateTime, checkTasks, checkAge } from './petUpdate';
 import styles from './petView.module.scss';
 import { Sprite } from './Sprite';
 
@@ -31,31 +33,72 @@ function calcHealth({ stage, health }) {
   ];
 }
 
+function CreateNewPet() {
+  return <Button>CreateNewPet</Button>;
+}
+
 export default function PetView() {
-  const [pet, setPet] = useState({
-    name: '',
-    species: 'cat',
-    color: 'green',
-    stage: 'child',
-    health: 100,
-    status: 'happy',
-    accessories: [],
-  });
+  const [checked, setChecked] = useState(0);
+  const [pet, setPet] = usePet();
+  // const [pet, setPet] = useState({
+  //   name: '',
+  //   species: 'cat',
+  //   color: 'green',
+  //   stage: 'child',
+  //   health: 100,
+  //   status: 'happy',
+  //   accessories: [],
+  // });
   const { name, species, color, stage, status, accessories } = pet;
 
-  const [percent, current, max, healthClass] = calcHealth(pet);
-
-  console.log(percent, current, max);
-
-  const userid = 'xEctZj50XFE34XzJD18LYVtO5hIb';
-  const id = '-aslkfjepa';
+  const userid = auth.currentUser.uid;
 
   const api = new Api({ db: database });
+
   useEffect(() => {
-    api.getPet(userid, id).then(function (_pet) {
-      setPet(_pet);
-    });
-  }, [userid, id]);
+    const timer = setTimeout(() => {
+      // force a state update to cause this useEffect to trigger again
+      setChecked(c => c + 1);
+      if (isUpdateTime(pet)) {
+        console.debug('hello???');
+        const checkDate = new Date(pet.nextUpdate);
+        const nextUpdate = new Date(
+          checkDate.getFullYear(),
+          checkDate.getMonth(),
+          checkDate.getDate() + 1,
+          checkDate.getHours(),
+          checkDate.getMinutes()
+        );
+
+        const updates = {
+          ...checkAge(pet),
+          nextUpdate: nextUpdate.toISOString(),
+        };
+
+        api.updatePet(userid, updates);
+        const updatedPet = {
+          ...pet,
+          ...updates,
+        };
+        setPet(updatedPet);
+        checkTasks(userid, updatedPet, newHealth => {
+          setPet({
+            ...updatedPet,
+            health: newHealth,
+            // status: newHealth === 0 ? 'dead' : updatedPet.status,
+          });
+          api.updatePet(userid, {
+            health: newHealth,
+            // status: updatedPet.status,
+          });
+        });
+      }
+      // every 60 seconds
+    }, 60 * 1000);
+    return () => clearTimeout(timer);
+  }, [checked]);
+
+  const [percent, current, max, healthClass] = calcHealth(pet);
 
   const [open, setOpen] = useState(false);
   const handleOpen = () => setOpen(true);
@@ -66,6 +109,9 @@ export default function PetView() {
       .updatePet(userid, _pet)
       .then(() => setPet(_pet))
       .catch(console.error);
+  };
+  const deletePet = (uid, _pet) => {
+    api.deletePet(uid, _pet).then(() => setPet(undefined));
   };
 
   return (
@@ -78,25 +124,32 @@ export default function PetView() {
           <Box className={styles.spriteContainer}>
             <Sprite color={color} status={status} stage={stage} />
           </Box>
-          <Box className={styles.petViewBottom}>
-            <Box className={clsx(styles.healthWrapper, healthClass)}>
-              <LinearProgress
-                color="primary"
-                variant="determinate"
-                value={percent}
-                className={styles.healthBar}
-                sx={{ height: 40 }}
-              />
-              <div className={styles.healthLabel}>HP </div>
+          {pet.status !== 'dead' ? (
+            <Box className={styles.petViewBottom}>
+              <Box className={clsx(styles.healthWrapper, healthClass)}>
+                <LinearProgress
+                  color="primary"
+                  variant="determinate"
+                  value={percent}
+                  className={styles.healthBar}
+                  sx={{ height: 40 }}
+                />
+                <div className={styles.healthLabel}>HP </div>
 
-              <div className={styles.healthValue}>
-                {current}/{max}
-              </div>
+                <div className={styles.healthValue}>
+                  {current}/{max}
+                </div>
+              </Box>
+
+              <IconButton onClick={handleOpen} className={styles.customButton}>
+                <CheckroomIcon />
+              </IconButton>
             </Box>
-            <IconButton onClick={handleOpen} className={styles.customButton}>
-              <CheckroomIcon />
-            </IconButton>
-          </Box>
+          ) : (
+            <Box className={styles.petViewBottom}>
+              <Button onClick={() => deletePet(userid, pet)}>Create New Pet</Button>
+            </Box>
+          )}
         </Box>
       )}
       <Modal open={open} onClose={handleClose}>
@@ -106,8 +159,10 @@ export default function PetView() {
   );
 }
 
+const MS_PER_DAY = 1000 * 3600 * 24;
 function CustomizationMenu({ pet, petUpdate }) {
   const [error, setError] = useState(null);
+  const petAge = Math.floor((new Date() - new Date(pet.birthday)) / MS_PER_DAY);
 
   // const handleName = event => {
   //   setName(event.target);
@@ -140,7 +195,7 @@ function CustomizationMenu({ pet, petUpdate }) {
           required
         />
         <TextField
-          value={`${pet.age} days old`}
+          value={`${petAge} days old`}
           variant="outlined"
           label="Pet Age"
           type="text"

@@ -2,11 +2,11 @@
     width: 100%;
     min-width: 20px;
     aspect-ratio: 1/1;
-    background-size: 700%;
-    animation: play 7s steps(7) infinite
+    background-size: 400%;
+    animation: play 6s steps(4) infinite
 }
 
 @keyframes play {
     from { background-position: 0 }
-    to { background-position: 700% }
+    to { background-position: 400% }
 }
