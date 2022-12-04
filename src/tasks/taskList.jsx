@@ -156,7 +156,18 @@ export function TaskToScreen() {
                 <React.Fragment key={task.id}>
                   <ListItemButton sx={{}}>
                     <CheckBox checked={task.done} onClick={() => handleChecked(idx)} />
-                    <ListItemText primary={task.name} />
+                    {/*<ListItemText primary={task.name} />*/}
+                    <ListItemText
+                      primary={
+                        task.done ? (
+                          <Typography sx={{ textDecoration: 'line-through' }}>
+                            {tasks[idx].name}
+                          </Typography>
+                        ) : (
+                          <Typography>{tasks[idx].name}</Typography>
+                        )
+                      }
+                    />
                     <IconButton variant="secondary" className="Edit-Btn" onClick={handleOpen}>
                       <EditIcon />
                       <Modal open={openEdit} onClose={handleCloseEdit}>
