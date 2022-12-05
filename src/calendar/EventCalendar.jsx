@@ -4,63 +4,11 @@ import dayGridPlugin from '@fullcalendar/daygrid'; // a plugin!
 import interactionPlugin from '@fullcalendar/interaction';
 import listPlugin from '@fullcalendar/list';
 import timeGridPlugin from '@fullcalendar/timegrid';
-import { Box, Button } from '@mui/material';
-import { getAuth } from 'firebase/auth';
-import moment from 'moment';
+import { Box } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import Api from '../api/api';
 import database, { auth } from '../api/firebase-config';
-import Modal from '../components/Modal';
 import { EditTask } from '../tasks/taskList';
-
-/* let testTitle = testTask.name;
- 
-  let testDescription = testTask.description;
-
-  let testDate = testTask.date;
-
-  function handleEventClick = clickInfo() => {
-    // eslint-disable-next-line no-restricted-globals
-    if (confirm(`Are you sure you want to delete the event '${clickInfo.event.title}'`)) {
-      clickInfo.event.remove();
-    }
-  };
-
-  function handleEvents = events => {
-    this.setState({
-      currentEvents: events,
-    });
-  };
-//This will render the event information for the calendar
-*/
-
-function TaskInfo({ taskInfo }) {
-  const api = new Api();
-  //const displayDate = new Date(date);
-
-  const [{ name, description, date, repeat }, setTask] = useState({
-    name: '',
-    description: '',
-    date: moment(date).format('YYYY-MM-DD'),
-    repeat: false,
-  });
-  // const event = JSON.stringify(taskInfo);
-  useEffect(() => {
-    api.getTask(taskInfo).then(function (task) {
-      setTask(task);
-    });
-  }, [taskInfo]);
-}
-
-// function renderEventContent(TaskInfo(1)) {
-//   return (
-//     <>
-//       <b>{eventInfo.timeText}</b>
-//       <i>{eventInfo.event.title}</i>
-//     </>
-//   )
-// }
-//const displayDate2 = new Date('2022/11/16');
 
 const style = {
   position: 'absolute',
@@ -74,11 +22,10 @@ const style = {
   p: 4,
 };
 
-export default function EventCalendar({ taskList, setList }) {
+export default function EventCalendar({ onEditsMade = () => {} }) {
   const api = new Api({ db: database });
   //--------------- GET CURRENT USER ---------------
   const user = auth.currentUser;
-  console.log({ user });
   //--------------- GET CURRENT USER ---------------
 
   const [tasks, setTasks] = useState([]);
@@ -88,38 +35,33 @@ export default function EventCalendar({ taskList, setList }) {
     if (!daterange.length) return;
     const start = daterange[0].toISOString().slice(0, 10);
     const end = daterange[1].toISOString().slice(0, 10);
-    console.log({ start, end });
     api
       .getTasksByDate(user.uid, start, end)
+      // eslint-disable-next-line @typescript-eslint/no-shadow
       .then(tasks => {
         setTasks(tasks);
       })
       .catch(console.error);
   }, [daterange]);
 
-  console.log({ tasks });
-
-  const [open, setOpen] = React.useState(false);
-  // const handleOpen = () => setOpen(true);
-  const handleClose = () => setOpen(prevState => !prevState);
-
-  const [info, setInfo] = useState({
-    id: '',
-    date: '',
-  });
-  const [task, setTask] = useState(null);
-
-  const handleClick = i => {
-    setOpen(true);
-    const date = i.start;
-    const [month, day, year] = [date.getMonth() + 1, date.getDate(), date.getFullYear()];
-    const taskDate = `${year}-${month}-0${day}`;
-    // setInfo({ id: i.id, date: taskDate });
-
-    api.getTask(user.uid, taskDate, i.id).then(t => setTask(t));
+  // idx of task being edited
+  const [editingTask, setEditingTask] = useState(null);
+  const updateTask = updatedTask => {
+    api
+      .editTask(user.uid, updatedTask)
+      .then(() => {
+        const originalTask = tasks[editingTask];
+        tasks[editingTask] = updatedTask;
+        if (updateTask.date !== originalTask.date) {
+          tasks.slice(editingTask, 1);
+          api.deleteTask(user.uid, originalTask);
+        }
+        setTasks([...tasks]);
+        onEditsMade();
+      })
+      .catch(console.error);
+    setEditingTask(null);
   };
-
-  console.debug(task);
 
   return (
     <>
@@ -142,14 +84,28 @@ export default function EventCalendar({ taskList, setList }) {
               eventMaxStack={true}
               weekends={true}
               // eslint-disable-next-line @typescript-eslint/no-shadow
-              events={tasks.map(task => ({ id: task.id, title: task.name, start: task.date }))}
-              eventClick={info => handleClick(info.event)}
+              events={tasks.map(task => ({
+                id: task.id,
+                title: task.name,
+                start: task.date,
+              }))}
+              eventClick={({ event }) => {
+                const idx = tasks.findIndex(t => t.id === event.id);
+                if (idx !== -1) setEditingTask(idx);
+              }}
               datesSet={({ start, end }) => setDaterange([start, end])}
             />
           </div>
         </Box>
       </div>
-      {!!task && <EditTask open={open} onClose={handleClose} task={task} />}
+      {editingTask !== null && (
+        <EditTask
+          open={true}
+          onClose={() => setEditingTask(null)}
+          task={tasks[editingTask]}
+          taskUpdate={updateTask}
+        />
+      )}
     </>
   );
 }

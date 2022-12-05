@@ -1,4 +1,3 @@
-//import * as fs from 'fs';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -16,50 +15,13 @@ import Tooltip from '@mui/material/Tooltip';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Api from '../api/api';
-//import { getTask } from '../api/mocks';
-//import { TaskType } from '../api/models';
 import database, { auth } from '../api/firebase-config';
 import EventCalendar from '../calendar/EventCalendar';
 import './taskList.css';
 import formStyles from '../components/Forms.module.scss';
 import Modal from '../components/Modal';
-import styles from '../pet/petView.module.scss';
-// eslint-disable-next-line import/order
-//import Modal from '@mui/material/Modal';
-//import Button from '@mui/material/Button';
-
-//const api = new Api();
-//console.log(api.getTask(1));
-
-function Task(id, name, desc, startD, endD, repetition) {
-  this.id = id;
-  this.name = name;
-  this.desc = desc;
-  this.startD = startD;
-  this.endD = endD;
-  this.repetition = repetition;
-}
-
-/*
-function getTask(task) {
-  return task;
-}
-
-function TaskList() {
-  taskList = [];
-}
-
-function AddTaskToList(task) {
-  taskList.push(task);
-}
-
-function getTaskList() {
-  return taskList;
-}
-
- */
 
 const dateInTZ = (date = new Date()) => {
   if (typeof date === 'string') date = new Date(date);
@@ -69,23 +31,12 @@ const dateInTZ = (date = new Date()) => {
 };
 
 export function TaskToScreen() {
-  // const [task, setTask] = useState({
-  //   name: '',
-  //   description: '',
-  //   repeat: false,
-  //   done: false,
-  //   date: '2022-01-01',
-  // });
   const [tasks, setTasks] = useState([]);
 
   const user = auth.currentUser;
   const uid = user.uid;
-  const taskid = '-NGtVoRCyZA8_m2FYju0';
 
-  // let today = new Date();
   let start = dateInTZ();
-  const testdate = start;
-
   const api = new Api({ db: database });
 
   const fetchAndDisplayTasks = (userid, date) => {
@@ -98,13 +49,8 @@ export function TaskToScreen() {
   };
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      fetchAndDisplayTasks(uid, testdate);
-    }, 0.5 * 1000);
-    return () => clearTimeout(timer);
-  }, [uid, testdate, taskid]);
-
-  window.api = api;
+    fetchAndDisplayTasks(uid, start);
+  }, [uid, start]);
 
   const handleChecked = idx => {
     tasks[idx].done = !tasks[idx].done;
@@ -121,8 +67,11 @@ export function TaskToScreen() {
   };
 
   const [editingTask, setEditingTask] = useState(null);
-  const handleOpen = idx => setEditingTask(idx);
+  const handleEditing = idx => setEditingTask(idx);
   const handleCloseEdit = () => setEditingTask(null);
+
+  const [addingTask, setAddingTask] = useState(false);
+  const [calendarOpen, setCalendarOpen] = useState(false);
 
   const updateTask = (idx, editedTask) => {
     const originalTask = tasks[idx];
@@ -142,9 +91,23 @@ export function TaskToScreen() {
 
   return (
     <>
+      <div id="myDIV" className="header">
+        <IconButton variant="secondary" onClick={() => setAddingTask(true)} className="Add-Btn">
+          <AddCircleIcon />
+        </IconButton>
+        <IconButton
+          variant="secondary"
+          onClick={() => setCalendarOpen(true)}
+          className="Calendar-Btn">
+          <CalendarMonthIcon />
+        </IconButton>
+        <h2>My Task List</h2>
+      </div>
       <NewTask
+        open={addingTask}
+        onClose={() => setAddingTask(false)}
         onCreate={() => {
-          fetchAndDisplayTasks(uid, testdate);
+          fetchAndDisplayTasks(uid, start);
         }}
       />
       <div id="tasks">
@@ -176,7 +139,7 @@ export function TaskToScreen() {
                   <IconButton
                     variant="secondary"
                     className="Edit-Btn"
-                    onClick={() => handleOpen(idx)}>
+                    onClick={() => handleEditing(idx)}>
                     <EditIcon />
                   </IconButton>
                   <IconButton
@@ -194,7 +157,7 @@ export function TaskToScreen() {
       </div>
       {editingTask !== null && (
         <EditTask
-          open={handleOpen}
+          open={handleEditing}
           onClose={handleCloseEdit}
           task={tasks[editingTask]}
           taskUpdate={editedTask => updateTask(editingTask, editedTask)}
@@ -202,32 +165,33 @@ export function TaskToScreen() {
           setTasks={setTasks}
         />
       )}
+      <Modal
+        open={calendarOpen}
+        onClose={() => setCalendarOpen(false)}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description">
+        <div>
+          <EventCalendar onEditsMade={() => fetchAndDisplayTasks(uid, start)} />
+        </div>
+      </Modal>
     </>
   );
 }
 
-export default function NewTask({ onCreate = () => {} }) {
-  const [modal, setModal] = useState(false);
+export default function NewTask({ open, onClose, onCreate = () => {} }) {
+  const user = auth.currentUser;
+
   const [title, setTitle] = useState('');
   const [desc, setDesc] = useState('');
-
   const [dueDate, setDueDate] = useState(new Date());
 
   const [anchorEl, setAnchorEl] = React.useState(null);
   const [selectedIndex, setSelectedIndex] = React.useState(1);
-  const open = Boolean(anchorEl);
+  const menuOpen = Boolean(anchorEl);
 
   const options = ['Choose an Option:', 'Daily', 'Weekly', 'None'];
 
   const api = new Api({ db: database });
-
-  const toggleModal = () => {
-    setModal(!modal);
-  };
-
-  const [openCal, setCal] = useState(false);
-  const handleOpen = () => setCal(true);
-  const handleCloseCal = () => setCal(false);
 
   const handleClickListItem = event => {
     setAnchorEl(event.currentTarget);
@@ -238,11 +202,11 @@ export default function NewTask({ onCreate = () => {} }) {
     setAnchorEl(null);
   };
 
-  const handleClose = () => {
+  const handleCloseMenu = () => {
     setAnchorEl(null);
   };
 
-  if (modal) {
+  if (open) {
     document.body.classList.add('active-modal');
   } else {
     document.body.classList.remove('active-modal');
@@ -251,72 +215,28 @@ export default function NewTask({ onCreate = () => {} }) {
   const handleSubmit = e => {
     e.preventDefault();
 
-    let sD = dateInTZ(dueDate);
-    console.log(dueDate, sD);
+    api
+      .addTask(user.uid, {
+        userid: user.uid,
+        name: title,
+        description: desc,
+        repeat: false,
+        done: false,
+        date: dateInTZ(dueDate),
+      })
+      .then(() => {
+        onCreate();
+      });
 
-    //let eD = endDate.toString();
-    let id = 1;
-
-    //var taskList = new TaskList();
-    let myTask = new Task(id, title, desc, sD, selectedIndex);
-
-    if (title && (desc || !desc) && dueDate && selectedIndex) {
-      console.log('Task ID: ' + myTask.id);
-      console.log('Task name: ' + myTask.name);
-      console.log('Description: ' + myTask.desc);
-      console.log('Start date: ' + myTask.startD);
-      // console.log('End date: ' + myTask.endD);
-      console.log('Repetition: ' + myTask.repetition);
-      //AddTaskToList(myTask);
-    }
-    toggleModal();
-
-    const user = auth.currentUser;
-
-    const task = {
-      id: '',
-      userid: user.uid,
-      name: myTask.name,
-      description: myTask.desc,
-      repeat: false,
-      done: false,
-      date: myTask.startD,
-    };
-
-    api.addTask(task.userid, task).then(() => {
-      onCreate();
-    });
-    // SaveTask({ api }, myTask.name, myTask.desc, myTask.startD, myTask.repetition);
-    //TaskToScreen();
+    onClose();
   };
 
   return (
     <>
-      <div id="myDIV" className="header">
-        <IconButton variant="secondary" onClick={toggleModal} className="Add-Btn">
-          <AddCircleIcon />
-        </IconButton>
-        <IconButton variant="secondary" onClick={handleOpen} className="Calendar-Btn">
-          <CalendarMonthIcon />
-        </IconButton>
-
-        <Modal
-          open={openCal}
-          onClose={handleCloseCal}
-          aria-labelledby="modal-modal-title"
-          aria-describedby="modal-modal-description">
-          <div>
-            <EventCalendar />
-          </div>
-        </Modal>
-        <h2>My Task List</h2>
-      </div>
-
       <form className="form" onSubmit={handleSubmit}>
-        {modal && (
+        {open && (
           <div className="modal-content">
-            <div onClick={toggleModal} className="modal-content"></div>
-
+            <div onClick={onClose} className="modal-content"></div>
             <div className={formStyles.form}>
               <Typography variant="h3" className={formStyles.heading}>
                 New Task
@@ -330,7 +250,6 @@ export default function NewTask({ onCreate = () => {} }) {
                   variant="outlined"
                 />
               </div>
-
               <div>
                 <TextField
                   sx={[{ pb: 5 }]}
@@ -340,7 +259,6 @@ export default function NewTask({ onCreate = () => {} }) {
                   variant="outlined"
                 />
               </div>
-
               <LocalizationProvider dateAdapter={AdapterDayjs}>
                 <DatePicker
                   required
@@ -349,22 +267,20 @@ export default function NewTask({ onCreate = () => {} }) {
                   dateFormat="MM/dd/yyyy"
                   //selected={startDate}
                   value={dueDate}
-                  onChange={date => date && setDueDate(dueDate)}
+                  onChange={date => date && setDueDate(date)}
                   renderInput={params => <TextField {...params} />}
                 />
               </LocalizationProvider>
-
               <List
                 component="nav"
                 aria-label="Device settings"
                 sx={{ bgcolor: 'background.paper' }}>
                 <ListItem
-                  button
                   id="lock-button"
                   aria-haspopup="listbox"
                   aria-controls="lock-menu"
                   aria-label="when device is locked"
-                  aria-expanded={open ? 'true' : undefined}
+                  aria-expanded={menuOpen ? 'true' : undefined}
                   onClick={handleClickListItem}>
                   <ListItemText primary="Repeat: " secondary={options[selectedIndex]} />
                 </ListItem>
@@ -372,8 +288,8 @@ export default function NewTask({ onCreate = () => {} }) {
               <Menu
                 id="lock-menu"
                 anchorEl={anchorEl}
-                open={open}
-                onClose={handleClose}
+                open={menuOpen}
+                onClose={handleCloseMenu}
                 MenuListProps={{
                   'aria-labelledby': 'lock-button',
                   role: 'listbox',
@@ -392,7 +308,7 @@ export default function NewTask({ onCreate = () => {} }) {
               <Button variant="contained" type="submit">
                 Submit
               </Button>
-              <button className="close-modal" onClick={toggleModal}>
+              <button className="close-modal" onClick={onClose}>
                 Close
               </button>
             </div>
