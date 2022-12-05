@@ -2,16 +2,19 @@ import AddCircleIcon from '@mui/icons-material/AddCircle';
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
-import { Alert, Box, Divider, IconButton, ListItemButton, Typography } from '@mui/material';
-import Button from '@mui/material/Button';
-import CheckBox from '@mui/material/Checkbox';
-import List from '@mui/material/List';
-import ListItem from '@mui/material/ListItem';
-import ListItemText from '@mui/material/ListItemText';
-import Menu from '@mui/material/Menu';
-import MenuItem from '@mui/material/MenuItem';
-import TextField from '@mui/material/TextField';
-import Tooltip from '@mui/material/Tooltip';
+import {
+  Alert,
+  Box,
+  Divider,
+  IconButton,
+  ListItemButton,
+  Typography,
+  Button,
+  Checkbox,
+  ListItemText,
+  TextField,
+  Tooltip,
+} from '@mui/material';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
@@ -123,7 +126,7 @@ export function TaskToScreen() {
                 arrow
                 sx={{ width: 100 }}>
                 <ListItemButton sx={{}}>
-                  <CheckBox checked={task.done} onClick={() => handleChecked(idx)} />
+                  <Checkbox checked={task.done} onClick={() => handleChecked(idx)} />
                   {/*<ListItemText primary={task.name} />*/}
                   <ListItemText
                     primary={
@@ -185,32 +188,7 @@ export default function NewTask({ open, onClose, onCreate = () => {} }) {
   const [desc, setDesc] = useState('');
   const [dueDate, setDueDate] = useState(new Date());
 
-  const [anchorEl, setAnchorEl] = React.useState(null);
-  const [selectedIndex, setSelectedIndex] = React.useState(1);
-  const menuOpen = Boolean(anchorEl);
-
-  const options = ['Choose an Option:', 'Daily', 'Weekly', 'None'];
-
   const api = new Api({ db: database });
-
-  const handleClickListItem = event => {
-    setAnchorEl(event.currentTarget);
-  };
-
-  const handleMenuItemClick = (event, index) => {
-    setSelectedIndex(index);
-    setAnchorEl(null);
-  };
-
-  const handleCloseMenu = () => {
-    setAnchorEl(null);
-  };
-
-  if (open) {
-    document.body.classList.add('active-modal');
-  } else {
-    document.body.classList.remove('active-modal');
-  }
 
   const handleSubmit = e => {
     e.preventDefault();
@@ -232,90 +210,45 @@ export default function NewTask({ open, onClose, onCreate = () => {} }) {
   };
 
   return (
-    <>
-      <form className="form" onSubmit={handleSubmit}>
-        {open && (
-          <div className="modal-content">
-            <div onClick={onClose} className="modal-content"></div>
-            <div className={formStyles.form}>
-              <Typography variant="h3" className={formStyles.heading}>
-                New Task
-              </Typography>
-              <div>
-                <TextField
-                  required
-                  onChange={e => setTitle(e.target.value)}
-                  id="taskName"
-                  label="Task Name:"
-                  variant="outlined"
-                />
-              </div>
-              <div>
-                <TextField
-                  sx={[{ pb: 5 }]}
-                  id="description"
-                  onChange={e => setDesc(e.target.value)}
-                  label="Description:"
-                  variant="outlined"
-                />
-              </div>
-              <LocalizationProvider dateAdapter={AdapterDayjs}>
-                <DatePicker
-                  required
-                  id="due"
-                  label="Due Date"
-                  dateFormat="MM/dd/yyyy"
-                  //selected={startDate}
-                  value={dueDate}
-                  onChange={date => date && setDueDate(date)}
-                  renderInput={params => <TextField {...params} />}
-                />
-              </LocalizationProvider>
-              <List
-                component="nav"
-                aria-label="Device settings"
-                sx={{ bgcolor: 'background.paper' }}>
-                <ListItem
-                  id="lock-button"
-                  aria-haspopup="listbox"
-                  aria-controls="lock-menu"
-                  aria-label="when device is locked"
-                  aria-expanded={menuOpen ? 'true' : undefined}
-                  onClick={handleClickListItem}>
-                  <ListItemText primary="Repeat: " secondary={options[selectedIndex]} />
-                </ListItem>
-              </List>
-              <Menu
-                id="lock-menu"
-                anchorEl={anchorEl}
-                open={menuOpen}
-                onClose={handleCloseMenu}
-                MenuListProps={{
-                  'aria-labelledby': 'lock-button',
-                  role: 'listbox',
-                }}>
-                {options.map((option, index) => (
-                  <MenuItem
-                    key={option}
-                    disabled={index === 0}
-                    selected={index === selectedIndex}
-                    onClick={event => handleMenuItemClick(event, index)}>
-                    {option}
-                  </MenuItem>
-                ))}
-              </Menu>
-
-              <Button variant="contained" type="submit">
-                Submit
-              </Button>
-              <button className="close-modal" onClick={onClose}>
-                Close
-              </button>
-            </div>
-          </div>
-        )}
+    <Modal open={open} onClose={onClose}>
+      <form onSubmit={handleSubmit}>
+        <div className={formStyles.form} style={{ width: '500px' }}>
+          <Typography variant="h3" className={formStyles.heading}>
+            New Task
+          </Typography>
+          <TextField
+            fullWidth
+            required
+            onChange={e => setTitle(e.target.value)}
+            id="taskName"
+            label="Task Name:"
+            variant="outlined"
+          />
+          <TextField
+            fullWidth
+            id="description"
+            onChange={e => setDesc(e.target.value)}
+            label="Description:"
+            variant="outlined"
+          />
+          <LocalizationProvider dateAdapter={AdapterDayjs}>
+            <DatePicker
+              required
+              id="due"
+              label="Due Date"
+              dateFormat="MM/dd/yyyy"
+              //selected={startDate}
+              value={dueDate}
+              onChange={date => date && setDueDate(date)}
+              renderInput={params => <TextField {...params} />}
+            />
+          </LocalizationProvider>
+          <Button variant="contained" type="submit">
+            Submit
+          </Button>
+        </div>
       </form>
-    </>
+    </Modal>
   );
 }
 
