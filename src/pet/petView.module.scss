@@ -10,7 +10,7 @@ $spriteMaxWidth: 25rem;
     height: 100%;
     padding-bottom: 2rem;
     border: solid 5px #175BA6;
-    border-radius: 10px 10px 0px 0px;
+    border-radius: 10px 10px 0 0;
     background-color: white;
 
     .petName {
@@ -73,6 +73,10 @@ $spriteMaxWidth: 25rem;
             flex: 0 0 10%;
             //background-color: #1c74d4;
             color: #1c74d4;
+        }
+
+        .newPetButton {
+            flex: 100%;
         }
 
         /* Apply different colors to the health bar based on the pet's

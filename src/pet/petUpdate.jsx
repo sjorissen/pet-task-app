@@ -8,16 +8,14 @@ export function isUpdateTime({ nextUpdate }) {
   return currentDate.getTime() >= checkDate.getTime();
 }
 
-export function checkTasks(uid, { health }, onHealthChange) {
-  const taskdate = '2022-11-15';
-
+export function checkTasks(uid, date, { health }, onHealthChange) {
   const api = new Api({ db: database });
 
-  api.getTasksByDate(uid, '1970', taskdate).then(tasksList => {
+  api.getTasksByDate(uid, '1970', date).then(tasksList => {
     const toPenalize = tasksList.filter(task => !task.done && !task.penalized);
     const penalty = toPenalize.length * 5;
     if (penalty) onHealthChange(health - penalty);
-    tasksList.forEach(task => api.editTask(uid, { id: task.id, taskdate, penalized: true }));
+    tasksList.forEach(task => api.editTask(uid, { id: task.id, date, penalized: true }));
   });
 }
 

@@ -13,7 +13,7 @@ import styles from './petView.module.scss';
 import { Sprite } from './Sprite';
 
 function calcHealth({ stage, health }) {
-  let [percentage, max] = [0, 100];
+  let percentage, max;
   switch (stage) {
     case 'child':
       [percentage, max] = [Math.round((health / 50) * 100), 50];
@@ -33,10 +33,6 @@ function calcHealth({ stage, health }) {
   ];
 }
 
-function CreateNewPet() {
-  return <Button>CreateNewPet</Button>;
-}
-
 export default function PetView() {
   const [checked, setChecked] = useState(0);
   const [pet, setPet] = usePet();
@@ -49,7 +45,7 @@ export default function PetView() {
   //   status: 'happy',
   //   accessories: [],
   // });
-  const { name, species, color, stage, status, accessories } = pet;
+  const { name, color, stage, status } = pet;
 
   const userid = auth.currentUser.uid;
 
@@ -60,7 +56,6 @@ export default function PetView() {
       // force a state update to cause this useEffect to trigger again
       setChecked(c => c + 1);
       if (isUpdateTime(pet)) {
-        console.debug('hello???');
         const checkDate = new Date(pet.nextUpdate);
         const nextUpdate = new Date(
           checkDate.getFullYear(),
@@ -81,15 +76,15 @@ export default function PetView() {
           ...updates,
         };
         setPet(updatedPet);
-        checkTasks(userid, updatedPet, newHealth => {
+        checkTasks(userid, pet.nextUpdate, updatedPet, newHealth => {
           setPet({
             ...updatedPet,
             health: newHealth,
-            // status: newHealth === 0 ? 'dead' : updatedPet.status,
+            status: newHealth === 0 ? 'dead' : updatedPet.status,
           });
           api.updatePet(userid, {
             health: newHealth,
-            // status: updatedPet.status,
+            status: updatedPet.status,
           });
         });
       }
@@ -110,8 +105,8 @@ export default function PetView() {
       .then(() => setPet(_pet))
       .catch(console.error);
   };
-  const deletePet = (uid, _pet) => {
-    api.deletePet(uid, _pet).then(() => setPet(undefined));
+  const deletePet = uid => {
+    api.deletePet(uid).then(() => setPet(undefined));
   };
 
   return (
@@ -147,7 +142,12 @@ export default function PetView() {
             </Box>
           ) : (
             <Box className={styles.petViewBottom}>
-              <Button onClick={() => deletePet(userid, pet)}>Create New Pet</Button>
+              <Button
+                variant="contained"
+                className={styles.newPetButton}
+                onClick={() => deletePet(userid)}>
+                Create New Pet
+              </Button>
             </Box>
           )}
         </Box>
