@@ -117,16 +117,22 @@ export function TaskToScreen() {
     // console.log('🤫');
   };
 
-  const [openEdit, setEdit] = useState(false);
-  const handleOpen = () => setEdit(true);
-  const handleCloseEdit = () => setEdit(false);
+  const [editingTask, setEditingTask] = useState(null);
+  const handleOpen = idx => setEditingTask(idx);
+  const handleCloseEdit = () => setEditingTask(null);
 
   const updateTask = (idx, editedTask) => {
     const originalTask = tasks[idx];
+    const sameDate = editedTask.date === originalTask.date;
+
+    // edit the task in local state... if it's no longer on today's date,
+    // remove it from local state
     tasks[idx] = editedTask;
+    if (!sameDate) tasks.splice(idx, 1);
     setTasks([...tasks]);
+
     api.editTask(user.uid, editedTask).then(() => {
-      if (editedTask.date !== originalTask.date) api.deleteTask(user.uid, originalTask);
+      if (!sameDate) api.deleteTask(user.uid, originalTask);
     });
     handleCloseEdit();
   };
@@ -165,7 +171,10 @@ export function TaskToScreen() {
                       )
                     }
                   />
-                  <IconButton variant="secondary" className="Edit-Btn" onClick={handleOpen}>
+                  <IconButton
+                    variant="secondary"
+                    className="Edit-Btn"
+                    onClick={() => handleOpen(idx)}>
                     <EditIcon />
                   </IconButton>
                   <IconButton
@@ -177,16 +186,18 @@ export function TaskToScreen() {
                 </ListItemButton>
               </Tooltip>
               <Divider />
-              <Modal open={openEdit} onClose={handleCloseEdit}>
-                <div style={{ width: '500px' }}>
-                  <EditTask task={task} taskUpdate={editedTask => updateTask(idx, editedTask)} />
-                </div>
-                {/*<Button className="close-modal" onClick={handleCloseEdit}></Button>*/}
-              </Modal>
             </div>
           ))}
         </ul>
       </div>
+      <Modal open={editingTask !== null} onClose={handleCloseEdit}>
+        <div style={{ width: '500px' }}>
+          <EditTask
+            task={tasks[editingTask]}
+            taskUpdate={editedTask => updateTask(editingTask, editedTask)}
+          />
+        </div>
+      </Modal>
     </>
   );
 }
@@ -243,7 +254,7 @@ export default function NewTask({ onCreate = () => {} }) {
   const handleSubmit = e => {
     e.preventDefault();
 
-    let sD = dateInTZ();
+    let sD = dateInTZ(dueDate);
     console.log(dueDate, sD);
 
     //let eD = endDate.toString();
