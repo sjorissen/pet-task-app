@@ -63,7 +63,7 @@ function getTaskList() {
 
 const dateInTZ = (date = new Date()) => {
   if (typeof date === 'string') date = new Date(date);
-  else if (!(date instanceof Date)) date = date.toDate();
+  if (!(date instanceof Date)) date = date.toDate();
   const zeroPadded = number => String(number).padStart(2, '0');
   return `${date.getFullYear()}-${zeroPadded(date.getMonth() + 1)}-${zeroPadded(date.getDate())}`;
 };
@@ -82,7 +82,7 @@ export function TaskToScreen() {
   const uid = user.uid;
   const taskid = '-NGtVoRCyZA8_m2FYju0';
 
-  let today = new Date();
+  // let today = new Date();
   let start = dateInTZ();
   const testdate = start;
 
@@ -98,7 +98,10 @@ export function TaskToScreen() {
   };
 
   useEffect(() => {
-    fetchAndDisplayTasks(uid, testdate);
+    const timer = setTimeout(() => {
+      fetchAndDisplayTasks(uid, testdate);
+    }, 0.5 * 1000);
+    return () => clearTimeout(timer);
   }, [uid, testdate, taskid]);
 
   window.api = api;
@@ -136,7 +139,6 @@ export function TaskToScreen() {
     });
     handleCloseEdit();
   };
-  // eslint-disable-next-line no-restricted-globals
 
   return (
     <>
@@ -190,14 +192,16 @@ export function TaskToScreen() {
           ))}
         </ul>
       </div>
-      <Modal open={editingTask !== null} onClose={handleCloseEdit}>
-        <div style={{ width: '500px' }}>
-          <EditTask
-            task={tasks[editingTask]}
-            taskUpdate={editedTask => updateTask(editingTask, editedTask)}
-          />
-        </div>
-      </Modal>
+      {editingTask !== null && (
+        <EditTask
+          open={handleOpen}
+          onClose={handleCloseEdit}
+          task={tasks[editingTask]}
+          taskUpdate={editedTask => updateTask(editingTask, editedTask)}
+          tasks={tasks}
+          setTasks={setTasks}
+        />
+      )}
     </>
   );
 }
@@ -243,13 +247,6 @@ export default function NewTask({ onCreate = () => {} }) {
   } else {
     document.body.classList.remove('active-modal');
   }
-
-  /*const name = document.getElementById('taskName');
-  const desc = document.getElementById('description');
-  const startD = document.getElementById('start');
-  const endD = document.getElementById('end');
-  const repetition = document.getElementById('lock-menu');*/
-  //const inputRef = useRef(null);
 
   const handleSubmit = e => {
     e.preventDefault();
@@ -352,7 +349,7 @@ export default function NewTask({ onCreate = () => {} }) {
                   dateFormat="MM/dd/yyyy"
                   //selected={startDate}
                   value={dueDate}
-                  onChange={date => date && setDueDate(date)}
+                  onChange={date => date && setDueDate(dueDate)}
                   renderInput={params => <TextField {...params} />}
                 />
               </LocalizationProvider>
@@ -406,7 +403,7 @@ export default function NewTask({ onCreate = () => {} }) {
   );
 }
 
-function EditTask({ task, taskUpdate }) {
+export function EditTask({ task, taskUpdate, open, onClose }) {
   const [error, setError] = useState(null);
   const [dueDate, setDueDate] = useState(task.date);
 
@@ -422,77 +419,52 @@ function EditTask({ task, taskUpdate }) {
   };
 
   return (
-    <Box>
-      <form onSubmit={onSubmit} className={formStyles.form}>
-        {error && <Alert severity="error">Something bad: {error}</Alert>}
-        <Typography variant="h3" className={formStyles.heading}>
-          Edit Task
-        </Typography>
-        <TextField
-          defaultValue={task.name}
-          variant="outlined"
-          label="Task Name"
-          name="name"
-          type="text"
-          size="small"
-          required
-          width={100}
-        />
-        <TextField
-          defaultValue={task.description}
-          variant="outlined"
-          label="Task Description"
-          name="description"
-          type="text"
-          size="small"
-        />
-        {/*<input name="date" hidden value={dueDate} />*/}
-        <LocalizationProvider dateAdapter={AdapterDayjs}>
-          <DatePicker
-            required
-            id="due"
-            label="Due Date"
-            dateFormat="MM/dd/yyyy"
-            value={dueDate}
-            onChange={date => {
-              setDueDate(date);
-            }}
-            renderInput={params => <TextField {...params} />}
-          />
-        </LocalizationProvider>
-        <Button variant="contained" type="submit">
-          Submit
-        </Button>
-      </form>
-    </Box>
+    <Modal open={open} onClose={onClose}>
+      <div style={{ width: '500px' }}>
+        <Box>
+          <form onSubmit={onSubmit} className={formStyles.form}>
+            {error && <Alert severity="error">Something bad: {error}</Alert>}
+            <Typography variant="h3" className={formStyles.heading}>
+              Edit Task
+            </Typography>
+            <TextField
+              defaultValue={task.name}
+              variant="outlined"
+              label="Task Name"
+              name="name"
+              type="text"
+              size="small"
+              required
+              width={100}
+            />
+            <TextField
+              defaultValue={task.description}
+              variant="outlined"
+              label="Task Description"
+              name="description"
+              type="text"
+              size="small"
+            />
+            {/*<input name="date" hidden value={dueDate} />*/}
+            <LocalizationProvider dateAdapter={AdapterDayjs}>
+              <DatePicker
+                required
+                id="due"
+                label="Due Date"
+                dateFormat="MM/dd/yyyy"
+                value={dueDate}
+                onChange={date => {
+                  setDueDate(date);
+                }}
+                renderInput={params => <TextField {...params} />}
+              />
+            </LocalizationProvider>
+            <Button variant="contained" type="submit">
+              Submit
+            </Button>
+          </form>
+        </Box>
+      </div>
+    </Modal>
   );
 }
-
-function SaveTask({ api }, title, desc, dueDate, selectedIndex) {
-  const user = auth.currentUser;
-  const task = {
-    id: '',
-    userid: user.uid,
-    name: title,
-    description: desc,
-    repeat: false,
-    done: false,
-    date: dueDate,
-  };
-
-  api.addTask(user.uid, task);
-}
-
-// function UpdateTask({ api }, title, desc, dueDate, selectedIndex) {
-//   const task = {
-//     id: '',
-//     userid: 'xEctZj50XFE34XzJD18LYVtO5hIb',
-//     name: title,
-//     description: desc,
-//     repeat: false,
-//     done: false,
-//     date: dueDate,
-//   };
-//
-//   api.editTask('xEctZj50XFE34XzJD18LYVtO5hIb', task);
-// }

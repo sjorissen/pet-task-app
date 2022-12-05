@@ -5,12 +5,13 @@ import interactionPlugin from '@fullcalendar/interaction';
 import listPlugin from '@fullcalendar/list';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import { Box, Button } from '@mui/material';
-import Modal from '@mui/material/Modal';
 import { getAuth } from 'firebase/auth';
 import moment from 'moment';
 import React, { useEffect, useState } from 'react';
 import Api from '../api/api';
 import database, { auth } from '../api/firebase-config';
+import Modal from '../components/Modal';
+import { EditTask } from '../tasks/taskList';
 
 /* let testTitle = testTask.name;
  
@@ -73,7 +74,7 @@ const style = {
   p: 4,
 };
 
-export default function EventCalendar() {
+export default function EventCalendar({ taskList, setList }) {
   const api = new Api({ db: database });
   //--------------- GET CURRENT USER ---------------
   const user = auth.currentUser;
@@ -98,9 +99,28 @@ export default function EventCalendar() {
 
   console.log({ tasks });
 
-  // const [open, setOpen] = React.useState(false);
+  const [open, setOpen] = React.useState(false);
   // const handleOpen = () => setOpen(true);
-  // const handleClose = () => setOpen(false);
+  const handleClose = () => setOpen(prevState => !prevState);
+
+  const [info, setInfo] = useState({
+    id: '',
+    date: '',
+  });
+  const [task, setTask] = useState(null);
+
+  const handleClick = i => {
+    setOpen(true);
+    const date = i.start;
+    const [month, day, year] = [date.getMonth() + 1, date.getDate(), date.getFullYear()];
+    const taskDate = `${year}-${month}-0${day}`;
+    // setInfo({ id: i.id, date: taskDate });
+
+    api.getTask(user.uid, taskDate, i.id).then(t => setTask(t));
+  };
+
+  console.debug(task);
+
   return (
     <>
       <div className="event-calendar">
@@ -122,37 +142,14 @@ export default function EventCalendar() {
               eventMaxStack={true}
               weekends={true}
               // eslint-disable-next-line @typescript-eslint/no-shadow
-              events={tasks.map(task => ({ title: task.name, start: task.date }))}
+              events={tasks.map(task => ({ id: task.id, title: task.name, start: task.date }))}
+              eventClick={info => handleClick(info.event)}
               datesSet={({ start, end }) => setDaterange([start, end])}
             />
           </div>
         </Box>
       </div>
+      {!!task && <EditTask open={open} onClose={handleClose} task={task} />}
     </>
   );
 }
-
-// handleDateSelect = selectInfo => {
-//   let title = prompt('Please enter a new title for your event');
-//   let description = prompt('Please give your event a description');
-//   // let startTime = prompt("Please give your event's starting time")
-//   // let endTime =  prompt("Please give your event's ending time")
-//
-//   let calendarApi = selectInfo.view.calendar;
-//
-//   calendarApi.unselect();
-//
-//   if (title) {
-//     calendarApi.addEvent({
-//       id: createEventId(),
-//       title,
-//       start: selectInfo.startStr,
-//       end: selectInfo.endStr,
-//       allDay: selectInfo.allDay,
-//       extendedProps: {
-//         description: description,
-//       },
-//     });
-//   }
-// };
-// }
