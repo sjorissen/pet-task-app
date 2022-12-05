@@ -12,7 +12,7 @@ import {
   query,
   remove,
 } from 'firebase/database';
-import { PetType, TaskType } from './models';
+import { PET_COLORS, PetType, TaskType } from './models';
 import { omitBy } from 'lodash';
 
 export default class Api {
@@ -34,7 +34,7 @@ export default class Api {
     return {
       name,
       species: 'cat',
-      color: 'red',
+      color: PET_COLORS[Math.round(Math.random()*(PET_COLORS.length - 1))],
       stage: 'child',
       health: 50,
       status: 'happy',
@@ -80,7 +80,7 @@ export default class Api {
     });
   }
 
-  async deletePet(userid: string, pet: PetType): Promise<void> {
+  async deletePet(userid: string): Promise<void> {
     await remove(ref(this.db, `users/${userid}/pet/`));
   }
 
