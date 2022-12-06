@@ -1,6 +1,13 @@
 import CheckroomIcon from '@mui/icons-material/Checkroom';
-import { Alert, Box, IconButton, LinearProgress, TextField, Typography } from '@mui/material';
-import Button from '@mui/material/Button';
+import {
+  Alert,
+  Box,
+  IconButton,
+  LinearProgress,
+  TextField,
+  Typography,
+  Button,
+} from '@mui/material';
 import clsx from 'clsx';
 import { useEffect, useState } from 'react';
 import Api from '../api/api';
@@ -36,15 +43,7 @@ function calcHealth({ stage, health }) {
 export default function PetView() {
   const [checked, setChecked] = useState(0);
   const [pet, setPet] = usePet();
-  // const [pet, setPet] = useState({
-  //   name: '',
-  //   species: 'cat',
-  //   color: 'green',
-  //   stage: 'child',
-  //   health: 100,
-  //   status: 'happy',
-  //   accessories: [],
-  // });
+
   const { name, color, stage, status } = pet;
 
   const userid = auth.currentUser.uid;
@@ -56,18 +55,14 @@ export default function PetView() {
       // force a state update to cause this useEffect to trigger again
       setChecked(c => c + 1);
       if (isUpdateTime(pet)) {
-        const checkDate = new Date(pet.nextUpdate);
-        const nextUpdate = new Date(
-          checkDate.getFullYear(),
-          checkDate.getMonth(),
-          checkDate.getDate() + 1,
-          checkDate.getHours(),
-          checkDate.getMinutes()
-        );
+        // midnight utc of pet.nextUpdate
+        const nextUpdate = new Date(pet.nextUpdate);
+        // whatever the next day is
+        nextUpdate.setDate(nextUpdate.getDate() + 1);
 
         const updates = {
           ...checkAge(pet),
-          nextUpdate: nextUpdate.toISOString(),
+          nextUpdate: nextUpdate.toISOString().slice(0, 10),
         };
 
         api.updatePet(userid, updates);
@@ -76,15 +71,24 @@ export default function PetView() {
           ...updates,
         };
         setPet(updatedPet);
-        checkTasks(userid, pet.nextUpdate, updatedPet, newHealth => {
+
+        console.debug({ pet, updatedPet });
+
+        checkTasks(userid, pet.nextUpdate.slice(0, 10), updatedPet, newHealth => {
+          const updatedStatus =
+            newHealth === 0
+              ? 'dead'
+              : calcHealth({ stage: updatedPet.stage, health: newHealth })[0] <= 50
+              ? 'sad'
+              : updatedPet.status;
           setPet({
             ...updatedPet,
             health: newHealth,
-            status: newHealth === 0 ? 'dead' : updatedPet.status,
+            status: updatedStatus,
           });
           api.updatePet(userid, {
             health: newHealth,
-            status: updatedPet.status,
+            status: updatedStatus,
           });
         });
       }
@@ -215,7 +219,6 @@ function CustomizationMenu({ pet, petUpdate }) {
           <option value="red">Red</option>
           <option value="void">Void</option>
         </TextField>
-        {/* TODO: change pet species */}
         <Button variant="contained" type="submit">
           Submit
         </Button>
