@@ -1,10 +1,41 @@
-# Getting Started with Create React App
+# Furry-Minder
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Inspired by the popular 90's toy, Tamagotchi, Furry-Minder helps to incentivize the user to stay productive and on task
+by tying the care of the pet to a to-do list. If tasks are finished in a timely manner, the pet will be fed & cared for, 
+and continue to grow. However, neglecting your tasks also means neglecting your pet, which will eventually lead to its 
+death, and starting all over again.
 
-## Available Scripts
+## Purpose
 
-In the project directory, you can run:
+Each day of our lives, we are faced with filling up our day with tasks that we don’t want to accomplish. We constantly 
+have to force ourselves to do them or get something out of it to get the job done. Due to natural human nature, we need 
+the incentive to feel accomplished after completing our tasks. To assist in this constant issue, Furry-Minder provides a
+solution. The pet helps incentivize the user to stay productive and on task by tying the pet's care to a to-do list. If 
+tasks are finished on time, the pet will be fed & cared for and continue to grow. However, neglecting your tasks also 
+means neglecting your pet, eventually leading to its death and starting all over again. Furry-Minder’s creation was 
+inspired by the popular 90’s toy, Tamagotchi. Similar to Tamagotchi pets, Furry-Minder’s purpose is to incentivize its
+users to complete their desired tasks on time while concurrently having an interactive pet to guide them along the way. 
+Furry-Minder provides user stimulus as their pet will deteriorate as they fail to complete tasks. If tasks are neglected
+for too long, the pet will also be neglected, leading to its death. The user will then have to be assigned a new baby 
+pet to start over again. On the flip side, as users complete their tasks, their pet will be given health which allows 
+them to grow. All pets will begin as a baby pet and progress to an adult. Further incentives to complete tasks include 
+the unlocking of items to customize their pet as well as pet color changes to maximize user motivation of use. Furry-Minder ideally targets users that are predominantly procrastinators and need an extra reward, or in some cases 
+punishment,  to get the job done. Furry-Minder is also for those that are nostalgic about the once popular and raving 
+Tamagotchi. This may include animal lovers who cannot stand to let a pet suffer, even if it may be electronic. However, 
+Furry-Minder is set apart from typical reminder or calendar systems and Tamagotchi due to its mix of innovative stimulus
+and practicality. The truth of the matter is: there has been nothing that compares to the combined functionality of 
+Furry-Minder out in the real world, until now.
+
+## Technology Used
+
+* Webstorm IDE
+* GitHub
+* Javascript, Typescript, CSS, SCSS, HTML
+* React Library
+* NodeJS
+* Windows/Ubuntu
+* FullCalendar API
+* Firebase
 
 ### `npm start`
 
